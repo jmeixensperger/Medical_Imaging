@@ -8,46 +8,45 @@
 
 %%% Single most important setting - the overall experiment type
 %%% used by do_all.m
-
 EXPERIMENT_TYPE = 'svm';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% DIRECTORIES - please change if copying the code to a new location
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%% Directory holding the experiment 
-RUN_DIR = [ '~/Documents/assignment3/experiments/bag_of_words' ];
+%%% Directory holding the experiment
+RUN_DIR = [ 'C:/wisbo/Documents/assignment3/experiments/bag_of_words' ];
 
 %%% Directory holding all the source images
-IMAGE_DIR = [ '~/Documents/assignment3/images' ];
+IMAGE_DIR = [ 'C:/wisbo/Documents/assignment3/images' ];
 
-%% Codebook directory - holds all VQ codebooks 
-CODEBOOK_DIR = [ RUN_DIR, '/codebooks' ];   
+%% Codebook directory - holds all VQ codebooks
+CODEBOOK_DIR = [ RUN_DIR, '/codebooks' ];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% GLOBAL PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Mostly boring file and directory name settings
 
-%% File name that holds locations of objects. The variable in the file 
+%% File name that holds locations of objects. The variable in the file
 %% is gt_bounding_boxes which is a 1 x nImages (of that class) cell
 %% array, each element holding a 4 x nInstances (per image) matrix, with
 %% the bounding box for each instance within the image. The format is:
 %% [top_left_x top_left_y width height];
 %% (should originally be in subdirectories of IMAGE_DIR, but will be
-%%  copied to RUN_DIR by do_preprocessing.m)
+    %%  copied to RUN_DIR by do_preprocessing.m)
 Global.Ground_Truth_Name = 'ground_truth_locations';
 
 %% how many zeros to prefix image, interest and model files by....
 Global.Num_Zeros = 4;
 
-%% subdirectory, file prefix and file extension of images 
+%% subdirectory, file prefix and file extension of images
 Global.Image_Dir_Name = 'images';
 Global.Image_File_Name = 'image_';
 %%% changing the extension changes to image format used...
 Global.Image_Extension = '.jpg';
 
-%% subdirectory, file prefix and file extension of interest point files 
+%% subdirectory, file prefix and file extension of interest point files
 Global.Interest_Dir_Name = 'interest_points';
 Global.Interest_File_Name = 'interest_';
 %% we assume all the interest point files have a .mat extension
@@ -63,29 +62,29 @@ Global.Model_File_Name = 'model_';
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% CATEGORIES 
+%%% CATEGORIES
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%% Image classes to use (cell array)
 Categories.Name = {'healthy',
-                   'diseased'
-                  };
+    'diseased'
+};
 
-%% Frame range for each of the classes to use 
+%% Frame range for each of the classes to use
 %% (must have an entry for each of the classes in Categories.Name)
 Categories.Frame_Range = { [1:100] ,
-                           [1:100]
-                         };
+    [1:100]
+};
 
-%% relative sizes of training and test sets 
+%% relative sizes of training and test sets
 %% 0.5 = equal; <0.5 = more testing; >0.5 = more training
 Categories.Train_Test_Portion = 0.5;
 
 %% load up random permutation of frame numbers
 if exist([RUN_DIR '/random_indices.mat']);
-  load([RUN_DIR '/random_indices.mat']);
+load([RUN_DIR '/random_indices.mat']);
 else %% if it doesn't exist create it....
-  error('random_indices.mat does not exist - run do_random_indices.m to create it');
+error('random_indices.mat does not exist - run do_random_indices.m to create it');
 end
 
 %% Set Train_Frames field from the random_ordering file
@@ -122,7 +121,7 @@ Preprocessing.Axis_For_Resizing     = 'x';
 Preprocessing.Rescale_Mode          = 'bilinear';
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% INTEREST OPERATOR 
+%%% INTEREST OPERATOR
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Type of interest operator to use
@@ -166,7 +165,7 @@ Recog.Best_Topic_Criterion = 'roc_area';
 %Recog.Best_Topic_Criterion = 'rpc_ap';
 %Recog.Best_Topic_Criterion = 'rpc_area';
 
-%% Control level of printed and plotted output during recognition   
+%% Control level of printed and plotted output during recognition
 Recog.Verbosity = 0;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -182,7 +181,8 @@ Plot.Example_Mode = 'ordered'; % image_0001, image_0002 etc.
 % Plot.Example_Mode = 'random'; % use random indices
 % Plot.Example_Mode = 'best'; % best by likelihood
 %Plot.Example_Mode = 'worst'; % worst by likelihood
-% Plot.Example_Mode = 'borderline'; % images close to descision threshold 
+% Plot.Example_Mode = 'borderline'; % images close to descision threshold
 
 %% show text above each frame or not
 Plot.Labels = 1;
+
