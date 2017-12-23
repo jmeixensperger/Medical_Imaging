@@ -16,7 +16,7 @@ EXPERIMENT_TYPE = 'svm';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%% Directory holding the experiment 
-RUN_DIR = [ '~/Documents/assignment3/experiments/bag_of_words' ];
+RUN_DIR = [ '~/Desktop/Medical_Imaging/experiments/bag_of_words' ];
 
 %%% Directory holding all the source images
 IMAGE_DIR = [ '~/Documents/assignment3/images' ];
