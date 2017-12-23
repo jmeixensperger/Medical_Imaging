@@ -4,13 +4,14 @@ import shutil
 def main() :
     for i in range(1,13):
         patientNum = "patient-1_" + str(i)
-        patientDirPath = "/Users/student/Desktop/converted/" + patientNum
+        globalPath = "~/Desktop/Medical_Imaging/converted"
+        patientDirPath = globalPath + patientNum
         patientPic = patientNum + ".jpg"
         if not os.path.exists(patientDirPath):
             os.makedirs( patientDirPath )
-        for f in os.listdir( "/Users/student/Desktop/converted") :
+        for f in os.listdir(globalPath) :
             if f.endswith( patientPic ) :
-                patientCurPath = "/Users/student/Desktop/converted/" + f
+                patientCurPath = globalPath + "/" + f
                 shutil.move(patientCurPath, patientDirPath )
         for file in os.listdir( patientDirPath ):
             Classes = ["healthy", "emphysema", "fibrosis", "ground_glass", "micronodules" ]
@@ -19,7 +20,7 @@ def main() :
 		        if not os.path.exists( classDirPath ):
                     		os.makedirs( classDirPath )
 	    	    	if file.startswith( classes ):
-                    		filePath = "/Users/student/Desktop/converted/" + file
+                    		filePath = globalPath + "/" + file
                     		classPath = classDirPath + '/' + file
                     		shutil.move( filePath, classDirPath ) 
                 
