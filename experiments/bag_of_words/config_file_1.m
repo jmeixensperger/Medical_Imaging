@@ -11,6 +11,11 @@
 
 EXPERIMENT_TYPE = 'svm';
 
+% Patient to test on
+TEST_PATIENT = "1";
+
+OS = 'mac';
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% DIRECTORIES - please change if copying the code to a new location
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -19,7 +24,7 @@ EXPERIMENT_TYPE = 'svm';
 RUN_DIR = [ '~/Desktop/Medical_Imaging/experiments/bag_of_words' ];
 
 %%% Directory holding all the source images
-IMAGE_DIR = [ '~/Documents/assignment3/images' ];
+IMAGE_DIR = [ '~/Desktop/Medical_Imaging/converted' ];
 
 %% Codebook directory - holds all VQ codebooks 
 CODEBOOK_DIR = [ RUN_DIR, '/codebooks' ];   
@@ -68,12 +73,18 @@ Global.Model_File_Name = 'model_';
 
 %%% Image classes to use (cell array)
 Categories.Name = {'healthy',
-                   'diseased'
+                   'emphysema',
+                   'fibrosis',
+                   'ground glass',
+                   'microndules'
                   };
 
 %% Frame range for each of the classes to use 
 %% (must have an entry for each of the classes in Categories.Name)
 Categories.Frame_Range = { [1:100] ,
+                           [1:100],
+                           [1:100],
+                           [1:100],
                            [1:100]
                          };
 
@@ -82,30 +93,30 @@ Categories.Frame_Range = { [1:100] ,
 Categories.Train_Test_Portion = 0.5;
 
 %% load up random permutation of frame numbers
-if exist([RUN_DIR '/random_indices.mat']);
-  load([RUN_DIR '/random_indices.mat']);
-else %% if it doesn't exist create it....
-  error('random_indices.mat does not exist - run do_random_indices.m to create it');
-end
+%if exist([RUN_DIR '/random_indices.mat']);
+%  load([RUN_DIR '/random_indices.mat']);
+%else %% if it doesn't exist create it....
+%  error('random_indices.mat does not exist - run do_random_indices.m to create it');
+%end
 
 %% Set Train_Frames field from the random_ordering file
-Categories.Train_Frames = train_frames;
+%Categories.Train_Frames = train_frames;
 
 %% same for test frames...
-Categories.Test_Frames = test_frames;
+%Categories.Test_Frames = test_frames;
 
 %% also get indices of all training frames
-Categories.All_Train_Frames = cat(2,train_frames{:});
+%Categories.All_Train_Frames = cat(2,train_frames{:});
 
 %% same for test frames......
-Categories.All_Test_Frames = cat(2,test_frames{:});
+%Categories.All_Test_Frames = cat(2,test_frames{:});
 
 %% Which classes are positive (1) and which are -ve (0)
 Categories.Labels = [ 1 0 ];
 
 %% Compute the total # categories and frames used
 Categories.Number = length(Categories.Name);
-Categories.Total_Frames = sum(cellfun('prodofsize',Categories.Frame_Range));
+Categories.Total_Frames = 200;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% IMAGE PREPROCESSING
