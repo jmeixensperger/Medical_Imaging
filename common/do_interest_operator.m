@@ -39,16 +39,49 @@ for i = 1 : length(old_files)
    fn = char(string(old_files(i).folder) + '/' + string(old_files(i).name));
    delete(fn); 
 end
-search_str = img_dir + '/*.jpg';
-chosen = zeros(1,length(dir(char(search_str))) - 2);
+
+healthy = zeros(1,length(dir(img_dir + '/healthy')));
+emphysema = zeros(1,length(dir(img_dir + '/emphysema')));
+fibrosis = zeros(1,length(dir(img_dir + '/fibrosis')));
+ground_glass = zeros(1,length(dir(img_dir + '/ground_glass')));
+micronodules = zeros(1,length(dir(img_dir + '/micronodules')));
 for i = 1 : Categories.Total_Frames
-    idx = uint16(rand() * (length(chosen)-1)) + 1;
-    while chosen(:,idx) == 1
-        idx = uint8(rand() * (length(chosen)-1)) + 1;
+    cat_num = mod(i, length(Categories.Name)) + 1;
+    cat_name = Categories.Name(cat_num);
+    dir_size = length(dir(char(img_dir + '/' + cat_name)));
+    if cat_name == 'healthy'
+        idx = uint16(rand() * (length(healthy)-2)) + 3;
+        while healthy(:,idx) == 1
+            idx = uint16(rand() * (length(healthy)-2)) + 3;
+        end
+        healthy(:,idx) = 1;
+    elseif cat_name == 'emphysema'
+        idx = uint16(rand() * (length(emphysema)-2)) + 3;
+        while emphysema(:,idx) == 1
+            idx = uint16(rand() * (length(emphysema)-2)) + 3;
+        end
+        emphysema(:,idx) = 1;
+    elseif cat_name == 'fibrosis'
+        idx = uint16(rand() * (length(fibrosis)-2)) + 3;
+        while fibrosis(:,idx) == 1
+            idx = uint16(rand() * (length(fibrosis)-2)) + 3;
+        end
+        fibrosis(:,idx) = 1;
+    elseif cat_name == 'ground_glass'
+        idx = uint16(rand() * (length(ground_glass)-2)) + 3;
+        while ground_glass(:,idx) == 1
+            idx = uint16(rand() * (length(ground_glass)-2)) + 3;
+        end
+        ground_glass(:,idx) = 1;
+    elseif cat_name == 'micronodules'
+        idx = uint16(rand() * (length(micronodules)-2)) + 3;
+        while micronodules(:,idx) == 1
+            idx = uint16(rand() * (length(micronodules)-2)) + 3;
+        end
+        micronodules(:,idx) = 1;
     end
-    chosen(:,idx) = 1;
-    img_file_names = [img_file_names; char(img_dir + '/' + Global.Image_File_Name + prefZeros(idx, 4) + '.jpg')];
-    ip_file_names = [ip_file_names; char(string(RUN_DIR) + '/' + Global.Interest_Dir_Name + '/' + Global.Image_File_Name + prefZeros(idx, 4) + '.mat')];
+    img_file_names = [img_file_names; char(img_dir + '/' + cat_name + '/' + Global.Image_File_Name + prefZeros(idx, 4) + '.jpg')];
+    ip_file_names = [ip_file_names; char(string(RUN_DIR) + '/' + Global.Interest_Dir_Name + '/' + cat_name + '/' + Global.Image_File_Name + prefZeros(idx, 4) + '.mat')];
 end
  
 %% Get list of output file names

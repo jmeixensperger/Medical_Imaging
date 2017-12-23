@@ -75,8 +75,8 @@ Global.Model_File_Name = 'model_';
 Categories.Name = {'healthy',
                    'emphysema',
                    'fibrosis',
-                   'ground glass',
-                   'microndules'
+                   'ground_glass',
+                   'micronodules'
                   };
 
 %% Frame range for each of the classes to use 

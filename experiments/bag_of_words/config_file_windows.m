@@ -74,8 +74,8 @@ Global.Model_File_Name = 'model_';
 Categories.Name = {'healthy',
                    'emphysema',
                    'fibrosis',
-                   'ground glass',
-                   'microndules'
+                   'ground_glass',
+                   'micronodules'
 };
 
 %% Frame range for each of the classes to use
@@ -96,16 +96,16 @@ Categories.Train_Test_Portion = 0.5;
 %end
 
 %% Set Train_Frames field from the random_ordering file
-Categories.Train_Frames = train_frames;
+%Categories.Train_Frames = train_frames;
 
 %% same for test frames...
-Categories.Test_Frames = test_frames;
+%Categories.Test_Frames = test_frames;
 
 %% also get indices of all training frames
-Categories.All_Train_Frames = cat(2,train_frames{:});
+%Categories.All_Train_Frames = cat(2,train_frames{:});
 
 %% same for test frames......
-Categories.All_Test_Frames = cat(2,test_frames{:});
+%Categories.All_Test_Frames = cat(2,test_frames{:});
 
 %% Which classes are positive (1) and which are -ve (0)
 Categories.Labels = [ 1 0 ];
