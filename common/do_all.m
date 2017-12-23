@@ -57,7 +57,7 @@ if strcmp(EXPERIMENT_TYPE,'naive_bayes')
 elseif strcmp(EXPERIMENT_TYPE,'svm')
   
     %%% generate random indices for trainig and test frames
-    do_random_indices(config_file);
+    %do_random_indices(config_file);
     
     %%% copy & resize images into experiment subdir
     do_preprocessing(config_file);

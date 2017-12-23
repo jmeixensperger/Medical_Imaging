@@ -52,19 +52,22 @@ if (nargin==1)
 end
 
 %% Get list of interest point file names
-ip_file_names =  genFileNames({Global.Interest_Dir_Name},Categories.All_Train_Frames,RUN_DIR,Global.Interest_File_Name,'.mat',Global.Num_Zeros);
- 
-%% How many images are we processing?
-nImages = length(Categories.All_Train_Frames);
+%ip_file_names =  genFileNames({Global.Interest_Dir_Name},Categories.All_Train_Frames,RUN_DIR,Global.Interest_File_Name,'.mat',Global.Num_Zeros);
 
 %% create variable to hold all descriptors
 all_descriptors = [];
 
 %% Load up all interest points from all images....
+ip_dir = string(RUN_DIR) + '/' + Global.Interest_Dir_Name;
+ip_search = ip_dir + '/*.mat';
+ip_file_names = dir(char(ip_search));
+%% How many images are we processing?
+nImages = length(ip_file_names);
 for i = 1:nImages
   
   %% load up all interest points
-  load(ip_file_names{i});
+  fn = char(string(ip_file_names(i).folder) + '/' + string(ip_file_names(i).name));
+  load(fn);
   
   %% Add descriptors to collection
   all_descriptors = [all_descriptors, descriptor];

@@ -107,9 +107,26 @@ Y = zeros(100,1);
 for i=1:50
     Y(i) = 1;
 end
+SVMModels = cell(5,1);
+classes = unique(Categories.Name);
+Y = Categories.Name;
+for i =1:numel(classes)
+    indx = strcmp(Y,classes(i));
+    SVMModels{i} = fitcsvm(X, indx, 'ClassNames', [false, true], 'Standardize', true, 'KernelFunction', 'rbf', 'OptimizeHyperparameters', 'auto');
+%SVMModel = fitcsvm(X,Y,'KernelFunction','rbf','KernelScale','auto','Standardize',true,'ClassNames',{'1', '0'}); 
+end
 
-SVMModel = fitcsvm(X,Y,'KernelFunction','rbf','KernelScale','auto','Standardize',true,'ClassNames',{'1', '0'}); 
-[predictY, values] = predict(SVMModel,X);
+d = 0.02;
+[x1grid,x2grid] = meshgrid(min(X(:,1)):d:max(X(:,1)), min(X(:,2)):d:max(X(:,2)));
+xgrid = [x1grid(:), x2grid(:)];
+N = size(xgrid, 1);
+Scores = zeros(N,numel(classes));
+for i=1:numel(classes)
+    [~,score] = predict(SVMModels{i},X);
+    Scores(:,i) = score(:,2);
+end
+
+[~,maxScore] = max(Scores,[],2);
 
 %%% Compute ROC and RPC on training data
 labels = [ones(1,length(pos_ip_file_names)) , zeros(1,length(neg_ip_file_names))];

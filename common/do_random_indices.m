@@ -17,7 +17,7 @@ catch
 end
   
 %% Check that Categories.Train_Test_Potion is sensible
-if ((Categories.Train_Test_Portion<=0) | (Categories.Train_Test_Portion>=1))
+if ((Categories.Train_Test_Portion<=0) || (Categories.Train_Test_Portion>=1))
   error('Categories.Train_Test_Potion should be greater than 0 and less than 1');
 end
     

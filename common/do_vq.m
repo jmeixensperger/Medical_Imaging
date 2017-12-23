@@ -39,7 +39,8 @@ end
 eval(config_file);
  
 %% Get list of interest point file names
-ip_file_names =  genFileNames({Global.Interest_Dir_Name},[1:Categories.Total_Frames],RUN_DIR,Global.Interest_File_Name,'.mat',Global.Num_Zeros);
+fn = char(string(RUN_DIR) + '/training.mat');
+load(fn);
  
 %% How many images are we processing?
 nImages = Categories.Total_Frames;
@@ -58,7 +59,7 @@ tic;
     end
     
     %%% Load up interest point file
-    load(ip_file_names{i});
+    load(ip_file_names(i,:));
     
     %%% Find number of points per image
     nPoints = length(scale);
@@ -88,7 +89,7 @@ tic;
     descriptor_vq = descriptor_vq';
     
     %%% append descriptor_vq variable to file....
-    save(ip_file_names{i},'descriptor_vq','histg','-append');
+    save(ip_file_names(i,:),'descriptor_vq','histg','-append');
     
   end
   
