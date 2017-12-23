@@ -17,11 +17,11 @@ def main() :
 	        for classes in Classes:
 		        classDirPath = patientDirPath + '/' + classes
 		        if not os.path.exists( classDirPath ):
-                    os.makedirs( classDirPath )
-	    	    if file.startswith( classes ):
-                    filePath = "/Users/student/Desktop/converted/" + file
-                    classPath = classDirPath + '/' + file
-                    shutil.move( filePath, classDirPath ) 
+                    		os.makedirs( classDirPath )
+	    	    	if file.startswith( classes ):
+                    		filePath = "/Users/student/Desktop/converted/" + file
+                    		classPath = classDirPath + '/' + file
+                    		shutil.move( filePath, classDirPath ) 
                 
         if os.listdir( patientDirPath ) == []:
             os.remove(patientDirPath)
