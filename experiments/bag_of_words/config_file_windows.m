@@ -10,15 +10,20 @@
 %%% used by do_all.m
 EXPERIMENT_TYPE = 'svm';
 
+% Patient to test on
+TEST_PATIENT = "1";
+
+OS = "windows";
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% DIRECTORIES - please change if copying the code to a new location
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%% Directory holding the experiment
-RUN_DIR = [ 'C:/wisbo/Documents/assignment3/experiments/bag_of_words' ];
+RUN_DIR = [ 'C:/Users/wisbo/Desktop/Medical_Imaging/experiments/bag_of_words' ];
 
 %%% Directory holding all the source images
-IMAGE_DIR = [ 'C:/wisbo/Documents/assignment3/images' ];
+IMAGE_DIR = [ 'C:/Users/wisbo/Documents/CS 385/converted' ];
 
 %% Codebook directory - holds all VQ codebooks
 CODEBOOK_DIR = [ RUN_DIR, '/codebooks' ];
@@ -67,7 +72,10 @@ Global.Model_File_Name = 'model_';
 
 %%% Image classes to use (cell array)
 Categories.Name = {'healthy',
-    'diseased'
+                   'emphysema',
+                   'fibrosis',
+                   'ground glass',
+                   'microndules'
 };
 
 %% Frame range for each of the classes to use
@@ -81,11 +89,11 @@ Categories.Frame_Range = { [1:100] ,
 Categories.Train_Test_Portion = 0.5;
 
 %% load up random permutation of frame numbers
-if exist([RUN_DIR '/random_indices.mat']);
-load([RUN_DIR '/random_indices.mat']);
-else %% if it doesn't exist create it....
-error('random_indices.mat does not exist - run do_random_indices.m to create it');
-end
+%if exist([RUN_DIR '/random_indices.mat']);
+%load([RUN_DIR '/random_indices.mat']);
+%else %% if it doesn't exist create it....
+%error('random_indices.mat does not exist - run do_random_indices.m to create it');
+%end
 
 %% Set Train_Frames field from the random_ordering file
 Categories.Train_Frames = train_frames;
@@ -185,4 +193,3 @@ Plot.Example_Mode = 'ordered'; % image_0001, image_0002 etc.
 
 %% show text above each frame or not
 Plot.Labels = 1;
-
