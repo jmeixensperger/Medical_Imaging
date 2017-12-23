@@ -112,7 +112,7 @@ Categories.Total_Frames = sum(cellfun('prodofsize',Categories.Frame_Range));
 
 %% Fixed size to which images are rescaled
 %% set to zero to leave images alone
-Preprocessing.Image_Size            = 200;
+Preprocessing.Image_Size            = 64;
 
 %% Which axis to use for the Image_Size parameter
 Preprocessing.Axis_For_Resizing     = 'x';
