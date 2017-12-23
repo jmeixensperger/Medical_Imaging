@@ -40,7 +40,7 @@ subFolders = files(dirFlags);
 pat_range = 148;
 pat_offset = 13;
 
-for pat = 96+pat_offset : pat_range
+for pat = 1 : pat_range
     pat_num = "";
     if pat < pat_offset
         pat_num = "-1_"+pat;
