@@ -28,6 +28,8 @@ IMAGE_DIR = [ 'C:/Users/wisbo/Documents/CS 385/converted' ];
 %% Codebook directory - holds all VQ codebooks
 CODEBOOK_DIR = [ RUN_DIR, '/codebooks' ];
 
+IP_DIR = [ RUN_DIR, '/interest_points' ];
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% GLOBAL PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -43,7 +45,7 @@ CODEBOOK_DIR = [ RUN_DIR, '/codebooks' ];
 Global.Ground_Truth_Name = 'ground_truth_locations';
 
 %% how many zeros to prefix image, interest and model files by....
-Global.Num_Zeros = 4;
+Global.Num_Zeros = 5;
 
 %% subdirectory, file prefix and file extension of images
 Global.Image_Dir_Name = 'images';
@@ -112,7 +114,7 @@ Categories.Labels = [ 1 0 ];
 
 %% Compute the total # categories and frames used
 Categories.Number = length(Categories.Name);
-Categories.Total_Frames = sum(cellfun('prodofsize',Categories.Frame_Range));
+Categories.Total_Frames = 500;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% IMAGE PREPROCESSING

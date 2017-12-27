@@ -34,7 +34,7 @@ eval(config_file);
 img_file_names = [];
 ip_file_names = [];
 img_dir = string(RUN_DIR) + '/' + string(Global.Image_Dir_Name);
-old_files = dir(char(IP_DIR + "/*.mat"));
+old_files = dir(char(img_dir + "/*.mat"));
 for i = 1 : length(old_files)
    fn = char(string(old_files(i).folder) + '/' + string(old_files(i).name));
    delete(fn); 
@@ -58,8 +58,7 @@ for i = 1 : Categories.Total_Frames
             idx = uint16(rand() * (length(healthy)-2)) + 3;
         end
         healthy(:,idx) = 1;
-        file_folder = string(dir_name(idx).folder) + '/';
-        file_name = string(dir_name(idx).name);
+        file_name = string(dir_name(idx).folder) + '/' + string(dir_name(idx).name);
     elseif cat_name == "emphysema"
         idx = uint16(rand() * (length(emphysema)-2)) + 3;
         while emphysema(:,idx) == 1
@@ -67,24 +66,21 @@ for i = 1 : Categories.Total_Frames
         end
         emphysema(:,idx) = 1;
         file_folder = string(dir_name(idx).folder) + '/';
-        file_name = string(dir_name(idx).name);
-    elseif cat_name == "fibrosis"
+        file_name = string(dir_name(idx).name);    elseif cat_name == "fibrosis"
         idx = uint16(rand() * (length(fibrosis)-2)) + 3;
         while fibrosis(:,idx) == 1
             idx = uint16(rand() * (length(fibrosis)-2)) + 3;
         end
         fibrosis(:,idx) = 1;
         file_folder = string(dir_name(idx).folder) + '/';
-        file_name = string(dir_name(idx).name);
-    elseif cat_name == "ground_glass"
+        file_name = string(dir_name(idx).name);    elseif cat_name == "ground_glass"
         idx = uint16(rand() * (length(ground_glass)-2)) + 3;
         while ground_glass(:,idx) == 1
             idx = uint16(rand() * (length(ground_glass)-2)) + 3;
         end
         ground_glass(:,idx) = 1;
         file_folder = string(dir_name(idx).folder) + '/';
-        file_name = string(dir_name(idx).name);
-    elseif cat_name == "micronodules"
+        file_name = string(dir_name(idx).name);    elseif cat_name == "micronodules"
         idx = uint16(rand() * (length(micronodules)-2)) + 3;
         while micronodules(:,idx) == 1
             idx = uint16(rand() * (length(micronodules)-2)) + 3;
@@ -93,11 +89,9 @@ for i = 1 : Categories.Total_Frames
         file_folder = string(dir_name(idx).folder) + '/';
         file_name = string(dir_name(idx).name);
     end
-    img_file_names = [img_file_names; file_folder + file_name];
-    file_name = strip(file_name, 'right', 'g');
-    file_name = strip(file_name, 'right', 'p');
-    file_name = strip(file_name, 'right', 'j');
-    ip_file_names = [ip_file_names; IP_DIR + "/" + file_name + "mat"];
+    img_file_names = [img_file_names; file_name];
+    file_name = IP_DIR + '/'
+    ip_file_names = [ip_file_names; file_name];
 end
  
 %% Get list of output file names

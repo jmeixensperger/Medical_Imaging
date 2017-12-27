@@ -27,7 +27,9 @@ RUN_DIR = [ '~/Desktop/Medical_Imaging/experiments/bag_of_words' ];
 IMAGE_DIR = [ '~/Desktop/Medical_Imaging/converted' ];
 
 %% Codebook directory - holds all VQ codebooks 
-CODEBOOK_DIR = [ RUN_DIR, '/codebooks' ];   
+CODEBOOK_DIR = [ RUN_DIR, '/codebooks' ];
+
+IP_DIR = [ RUN_DIR, '/interest_points' ];
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% GLOBAL PARAMETERS

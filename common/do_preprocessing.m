@@ -27,7 +27,7 @@ function do_preprocessing(config_file)
 eval(config_file);
 
 %%% reset frame counter
-frame_counter = 1;
+frame_counter = 0;
 
 %%% make directory in experimental dir. for images
 [s,m1,m2]=mkdir(RUN_DIR,Global.Image_Dir_Name);
@@ -37,9 +37,9 @@ files = dir(IMAGE_DIR);
 dirFlags = [files.isdir];
 subFolders = files(dirFlags);
 
-pat_range = 148;
+pat_range = 149;
 pat_offset = 13;
-
+patients_processed = 0;
 for pat = 1 : pat_range
     pat_num = "";
     if pat < pat_offset
@@ -47,15 +47,16 @@ for pat = 1 : pat_range
     else
         pat_num = int2str(pat - pat_offset);
     end
-    for cat = 1 : Categories.Number
       
-      pat_dir = IMAGE_DIR + "/patient" + pat_num;
+    pat_dir = IMAGE_DIR + "/patient" + pat_num;
       
       % Check that our patient exists before trying to load files
       % Don't include test patient in training images - we will handle this
       % later
-      if exist(pat_dir, 'dir') && pat_num ~= TEST_PATIENT
-
+    num_processed = 0;
+    if exist(pat_dir, 'dir') && pat_num ~= TEST_PATIENT
+       patients_processed = patients_processed + 1;
+       for cat = 1 : Categories.Number
           %%% Generate filenames for images
           in_file_names = dir(char(pat_dir+'/'+Categories.Name(cat)));
           
@@ -117,9 +118,10 @@ for pat = 1 : pat_range
 
             %%% increment frame counter
             frame_counter = frame_counter + 1;
+            num_processed = num_processed + 1;
 
             if (mod(frame_counter,10)==0)
-              fprintf('.%d',frame_counter);
+              fprintf('.');
             end
 
           end
@@ -131,7 +133,8 @@ for pat = 1 : pat_range
             %save(fn,'gt_bounding_boxes');
           %end
 
-          fprintf('\n');
-      end
+          
+       end
+      fprintf("\nPatient "+pat_num+": "+int2str(num_processed)+" images processed\tTotal: "+int2str(frame_counter)+"\n");
     end
 end
