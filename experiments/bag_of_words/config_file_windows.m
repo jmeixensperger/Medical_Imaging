@@ -114,7 +114,8 @@ Categories.Labels = [ 1 0 ];
 
 %% Compute the total # categories and frames used
 Categories.Number = length(Categories.Name);
-Categories.Total_Frames = 500;
+%% Manually set the number of TRAINING images (limited by # of patients available)
+Categories.Total_Frames = 200;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% IMAGE PREPROCESSING

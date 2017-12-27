@@ -29,91 +29,92 @@ eval(config_file);
 [s,m1,m2]=mkdir(RUN_DIR,Global.Model_Dir_Name);
 
 %% get all file names of training image interest point files
-
-%% get +ve interest point file names
-pos_ip_file_names = [];
-pos_sets = find(Categories.Labels==1);
-for a=1:length(pos_sets)
-    pos_ip_file_names =  [pos_ip_file_names , genFileNames({Global.Interest_Dir_Name},Categories.Train_Frames{pos_sets(a)},RUN_DIR,Global.Interest_File_Name,'.mat',Global.Num_Zeros)];
+temp_file_names = dir(IP_DIR);
+temp_file_names = temp_file_names(3:end);
+ip_file_names = [];
+for a=1:length(temp_file_names)
+    %pos_ip_file_names =  [pos_ip_file_names , ];
+    file_name = char(string(temp_file_names(a).folder) + "/" + string(temp_file_names(a).name));
+    ip_file_names = [ip_file_names; file_name];
 end
 
 %% get -ve interest point file names
-neg_ip_file_names = [];
-neg_sets = find(Categories.Labels==0);
-for a=1:length(neg_sets)
-    neg_ip_file_names =  [neg_ip_file_names , genFileNames({Global.Interest_Dir_Name},Categories.Train_Frames{neg_sets(a)},RUN_DIR,Global.Interest_File_Name,'.mat',Global.Num_Zeros)];
-end
+%neg_ip_file_names = [];
+%neg_sets = find(Categories.Labels==0);
+%for a=1:length(neg_sets)
+%    neg_ip_file_names =  [neg_ip_file_names , genFileNames({Global.Interest_Dir_Name},Categories.Train_Frames{neg_sets(a)},RUN_DIR,Global.Interest_File_Name,'.mat',Global.Num_Zeros)];
+%end
 
 %% Create matrix to hold word histograms from +ve images
-X_fg = zeros(VQ.Codebook_Size,length(pos_ip_file_names));
+X = zeros(VQ.Codebook_Size,length(ip_file_names));
 
 %% load up all interest_point files which should have the histogram
 %% variable already computed (performed by do_vq routine).
-for a=1:length(pos_ip_file_names)
+classes = unique(Categories.Name);
+Y = cell(length(ip_file_names),1);
+for a=1:length(ip_file_names)
     %% load file
-    load(pos_ip_file_names{a});
+    load(char(ip_file_names(a,:)));
     %% store histogram
-    X_fg(:,a) = histg';    
+    X(:,a) = histg';
+    %% store labels
+    temp_Y = "none";
+    for n=1:length(classes)
+        if ground_truth == classes(n)
+            temp_Y = ground_truth;
+        end
+    end
+    Y(a) = cellstr(temp_Y);
 end 
 
-%% Create matrix to hold word histograms from -ve images
-X_bg = zeros(VQ.Codebook_Size,length(neg_ip_file_names));
+%% OLD CODE
+    % Create matrix to hold word histograms from -ve images
+    %X_bg = zeros(VQ.Codebook_Size,length(neg_ip_file_names));
+    % load up all interest_point files which should have the histogram
+    % variable already computed (performed by do_vq routine).
+    %for a=1:length(neg_ip_file_names)
+    %    %% load file
+    %    load(neg_ip_file_names{a});
+    %    %% store histogram
+    %    X_bg(:,a) = histg';    
+    %end
+    %%% Now construct probability of word given class using SVM classifier 
+    % positive 
+    %Pw_pos = (1 + sum(X_fg,2)) / (VQ.Codebook_Size + sum(sum(X_fg)));
+    % positive 
+    %Pw_neg = (1 + sum(X_bg,2)) / (VQ.Codebook_Size + sum(sum(X_bg)));
+    %%% Compute posterior probability of each class given likelihood models
+    %%% assume equal priors on each class
+    class_priors = [0.5 0.5];
+    %%% positive model on positive training images
+    %for a=1:length(pos_ip_file_names)
+    %    Pc_d_pos_train(1,a) = log(class_priors(1)) + sum(X_fg(:,a) .* log(Pw_pos)); 
+    %end
+    %%% negative model on positive training images
+    %for a=1:length(pos_ip_file_names)
+    %    Pc_d_pos_train(2,a) = log(class_priors(2)) + sum(X_fg(:,a) .* log(Pw_neg)); 
+    %end
+    %%% positive model on negative training images
+    %for a=1:length(neg_ip_file_names)
+    %    Pc_d_neg_train(1,a) = log(class_priors(1)) + sum(X_bg(:,a) .* log(Pw_pos)); 
+    %enD
+    %%% negative model on negitive training images
+    %for a=1:length(neg_ip_file_names)
+    %    Pc_d_neg_train(2,a) = log(class_priors(2)) + sum(X_bg(:,a) .* log(Pw_neg)); 
+    %end
+    % Concatenate data
+    %X = cat(2, X_fg, X_bg)';
+    %Y = zeros(100,1);
+    %for i=1:50
+    %    Y(i) = 1;
+    %end
 
-%% load up all interest_point files which should have the histogram
-%% variable already computed (performed by do_vq routine).
-for a=1:length(neg_ip_file_names)
-    %% load file
-    load(neg_ip_file_names{a});
-    %% store histogram
-    X_bg(:,a) = histg';    
-end
-
-%%% Now construct probability of word given class using Naive Bayes classifier 
-%%% as per Csurka and Dance ECCV 04 paper.
-
-%% positive 
-Pw_pos = (1 + sum(X_fg,2)) / (VQ.Codebook_Size + sum(sum(X_fg)));
-
-%% positive 
-Pw_neg = (1 + sum(X_bg,2)) / (VQ.Codebook_Size + sum(sum(X_bg)));
-
-%%% Compute posterior probability of each class given likelihood models
-%%% assume equal priors on each class
-class_priors = [0.5 0.5];
-
-%%% positive model on positive training images
-for a=1:length(pos_ip_file_names)
-    Pc_d_pos_train(1,a) = log(class_priors(1)) + sum(X_fg(:,a) .* log(Pw_pos)); 
-end
-
-%%% negative model on positive training images
-for a=1:length(pos_ip_file_names)
-    Pc_d_pos_train(2,a) = log(class_priors(2)) + sum(X_fg(:,a) .* log(Pw_neg)); 
-end
-
-%%% positive model on negative training images
-for a=1:length(neg_ip_file_names)
-    Pc_d_neg_train(1,a) = log(class_priors(1)) + sum(X_bg(:,a) .* log(Pw_pos)); 
-end
-
-%%% negative model on negitive training images
-for a=1:length(neg_ip_file_names)
-    Pc_d_neg_train(2,a) = log(class_priors(2)) + sum(X_bg(:,a) .* log(Pw_neg)); 
-end
-
-% Concatenate data
-X = cat(2, X_fg, X_bg)';
-Y = zeros(100,1);
-for i=1:50
-    Y(i) = 1;
-end
+X = X';
 SVMModels = cell(5,1);
 classes = unique(Categories.Name);
-Y = Categories.Name;
 for i =1:numel(classes)
     indx = strcmp(Y,classes(i));
     SVMModels{i} = fitcsvm(X, indx, 'ClassNames', [false, true], 'Standardize', true, 'KernelFunction', 'rbf', 'OptimizeHyperparameters', 'auto');
-%SVMModel = fitcsvm(X,Y,'KernelFunction','rbf','KernelScale','auto','Standardize',true,'ClassNames',{'1', '0'}); 
 end
 
 d = 0.02;
@@ -122,10 +123,10 @@ xgrid = [x1grid(:), x2grid(:)];
 N = size(xgrid, 1);
 Scores = zeros(N,numel(classes));
 for i=1:numel(classes)
-    [~,score] = predict(SVMModels{i},X);
+    % CURRENTLY FAILING ON THE FOLLOWING LINE:
+    [~,score] = predict(SVMModels{i},xgrid);
     Scores(:,i) = score(:,2);
 end
-
 [~,maxScore] = max(Scores,[],2);
 
 %%% Compute ROC and RPC on training data

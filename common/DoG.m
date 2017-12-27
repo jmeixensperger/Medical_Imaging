@@ -47,10 +47,23 @@ for i = 1:nImages
    descriptor = d;
    score = ones(1, nFeats);
 
+   % save ground truth information
+   ground_truth = "";
+   if contains(filestr,"healthy")
+       ground_truth = "healthy";
+   elseif contains(filestr,"emphysema")
+       ground_truth = "emphysema";
+   elseif contains(filestr,"fibrosis")
+       ground_truth = "fibrosis";
+   elseif contains(filestr,"micronodules")
+       ground_truth = "micronodules";
+   elseif contains(filestr,"ground_glass")
+       ground_truth = "ground_glass";
+   end
 
   fprintf('Image: %d, Number of features detected: %d\n',i,length(x));
   % Save in output file
-  save(output_file_names(i,:),'x','y','scale','angle','descriptor','score');
+  save(output_file_names(i,:),'x','y','scale','angle','descriptor','score','ground_truth');
   
    %%% print out progress every 10 images    
    if (mod(i,10)==0)
