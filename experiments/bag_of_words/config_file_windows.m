@@ -11,7 +11,7 @@
 EXPERIMENT_TYPE = 'svm';
 
 % Patient to test on
-TEST_PATIENT = "1";
+TEST_PATIENT = "24";
 
 OS = "windows";
 

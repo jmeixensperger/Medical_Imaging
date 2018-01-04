@@ -21,7 +21,6 @@ function do_svm(config_file)
 % R.Fergus (fergus@csail.mit.edu) 03/10/05.  
 %%
 % Evaluate global configuration file
-config_file = 'config_file_windows';
 eval(config_file);
 
 % ensure models subdir is present
@@ -31,19 +30,19 @@ eval(config_file);
 temp_file_names = dir(IP_DIR);
 temp_file_names = temp_file_names(3:end);
 ip_file_names = [];
-for a=1:length(temp_file_names)
+for a=1:size(temp_file_names,1)
     %pos_ip_file_names =  [pos_ip_file_names , ];
     file_name = char(string(temp_file_names(a).folder) + "/" + string(temp_file_names(a).name));
     ip_file_names = [ip_file_names; file_name];
 end
 
 % Create matrix to hold word histograms from +ve images
-X = zeros(VQ.Codebook_Size,length(ip_file_names));
+X = zeros(VQ.Codebook_Size,size(ip_file_names,1));
 
 % load up all interest_point files which should have the histogram
 % variable already computed (performed by do_vq routine).
 classes = unique(Categories.Name);
-Y = cell(length(ip_file_names),1);
+Y = cell(size(ip_file_names,1),1);
 for a=1:length(ip_file_names)
     % load file
     load(char(ip_file_names(a,:)));
@@ -81,7 +80,7 @@ figure
 train_auc = zeros(numel(classes),1);
 train_opt = zeros(numel(classes),1);
 for i=1:numel(classes)
-    scores = double(zeros(length(maxScore),1));
+    scores = double(zeros(size(maxScore,1),1));
     for j=1:length(maxScore)
         if maxScore(j) == i
             scores(j) = 1;

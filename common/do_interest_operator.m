@@ -26,7 +26,30 @@ eval(config_file);
 %% Create directories for interest points
 [s,m1,m2]=mkdir(RUN_DIR,Global.Interest_Dir_Name);
 
-%% Perform interest operator on test images
+%% Perform interest operator on testing images
+test_file_names = [];
+test_out_file_names = [];
+old_files = dir(char(TEST_DIR + "/*.mat"));
+for i = 1 : length(old_files)
+   fn = char(string(old_files(i).folder) + '/' + string(old_files(i).name));
+   delete(fn); 
+end
+
+for i = 1 : length(Categories.Name)
+    cat_dir = char(TEST_DIR + "/" + Categories.Name(i));
+    listing = dir(cat_dir);
+    file_folder = "";
+    file_name = "";
+    for j = 3:length(listing)
+        file_folder = string(listing(j).folder) + '/';
+        file_name = string(listing(j).name);
+        test_file_names = [test_file_names; file_folder + file_name];
+        file_name = strip(file_name, 'right', 'g');
+        file_name = strip(file_name, 'right', 'p');
+        file_name = strip(file_name, 'right', 'j');
+        test_out_file_names = [test_out_file_names; TEST_DIR + "/" + file_name + "mat"];
+    end
+end
 
 %% Perform interest operator on training images (randomly chosen)
 
@@ -111,19 +134,21 @@ if strcmp(Interest_Point.Type,'Edge_Sampling')
 
   %%% Edge Sampling: simple, crude interest operator.
   Edge_Sampling(img_file_names,ip_file_names,Interest_Point);
+  Edge_Sampling(test_file_names,test_out_file_names,Interest_Point);
   
 elseif strcmp(Interest_Point.Type,'DoG')
   
   %% Laplacian of Gaussian method to obtain key points (implemented as difference of Gaussian)
   % Now returns filter responses from MR8 filters
   DoG(img_file_names,ip_file_names);
+  DoG(test_file_names,test_out_file_names);
 else
   error('Unknown type of operator');
 end
 
 total_time=toc;
 fn = [RUN_DIR,'/training.mat'];
-save(fn,'img_file_names','ip_file_names');
+save(fn,'img_file_names','ip_file_names','test_file_names','test_out_file_names');
 
 fprintf('\nFinished running interest point operator\n');
 fprintf('Total number of images: %d, mean time per image: %f secs\n',Categories.Total_Frames,total_time/Categories.Total_Frames);

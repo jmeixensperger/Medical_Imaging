@@ -60,20 +60,6 @@ for pat = 1 : pat_range
        for cat = 1 : Categories.Number
           %%% Generate filenames for images
           in_file_names = dir(char(pat_dir+'/'+Categories.Name(cat)));
-          
-          %%% load up gronud truth location file (it exists)
-          %ground_truth_loc = pat_dir + '/' + Categories.Name{cat} + '/' + Global.Ground_Truth_Name + '.mat';
-          %if (exist(ground_truth_loc, 'file'))
-            %% load up file
-            %load([IMAGE_DIR,'/',"patient"+pat_num+Categories.Name{cat},'/',Global.Ground_Truth_Name,'.mat']);
-            %% copy the variable held in file
-            %gt_bounding_boxes_original = gt_bounding_boxes;
-            %clear gt_bounding_boxes; %% clear original
-            %% set flag
-            %location_information_present = 1;    
-          %else
-            %location_information_present = 0;
-          %end
 
           for frame = 3:length(in_file_names)
 
@@ -103,11 +89,6 @@ for pat = 1 : pat_range
               scale_factor = 1;
             end
 
-            %%% resize ground truth location information
-            %if (location_information_present)
-            %  gt_bounding_boxes{frame} = gt_bounding_boxes_original{frame} * scale_factor;
-            %end
-
             outdir = char(string(RUN_DIR)+'/'+Global.Image_Dir_Name+'/'+Categories.Name(cat));
             if ~exist(outdir,'dir')
                 mkdir(outdir);
@@ -127,14 +108,6 @@ for pat = 1 : pat_range
 
           end
 
-          %if (location_information_present)  
-            %% Now save rescaled ground truth information to RUNDIR, using class
-            %% name as tag (since we mgiht have several classes with gt_location information).
-            %fn = [RUN_DIR,'/',Global.Ground_Truth_Name,'_',Categories.Name{cat},'.mat'];
-            %save(fn,'gt_bounding_boxes');
-          %end
-
-          
        end
       fprintf("\nPatient "+pat_num+": "+int2str(num_processed)+" images processed\tTotal: "+int2str(frame_counter)+"\n");
     elseif pat_num == TEST_PATIENT % put test patient data into sub folder
@@ -168,12 +141,13 @@ for pat = 1 : pat_range
               scale_factor = 1;
             end
 
-            if ~exist(char(TEST_DIR),'dir')
-                mkdir(char(TEST_DIR));
+            cat_dir = char(string(TEST_DIR) + '/' + Categories.Name(cat));
+            if ~exist(cat_dir,'dir')
+                mkdir(cat_dir);
             end
             test_counter = test_counter + 1;
             %%% Now save out to directory.
-            fname = char(string(TEST_DIR)+'/'+Categories.Name+'/'+Global.Image_File_Name+prefZeros(test_counter,Global.Num_Zeros)+Global.Image_Extension);
+            fname = char(string(TEST_DIR)+'/'+Categories.Name(cat)+'/'+Global.Image_File_Name+prefZeros(test_counter,Global.Num_Zeros)+Global.Image_Extension);
             imwrite(im,fname,Global.Image_Extension(2:end));
           end
         end
