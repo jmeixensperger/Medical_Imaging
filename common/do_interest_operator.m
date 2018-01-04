@@ -26,10 +26,9 @@ eval(config_file);
 %% Create directories for interest points
 [s,m1,m2]=mkdir(RUN_DIR,Global.Interest_Dir_Name);
 
-%% Get list of file name of input images
-% Edit Total_Frames in config file to change number of training images that
-% get generated here
-%genFileNames({Global.Image_Dir_Name},[1:Categories.Total_Frames],RUN_DIR,Global.Image_File_Name,Global.Image_Extension,Global.Num_Zeros);
+%% Perform interest operator on test images
+
+%% Perform interest operator on training images (randomly chosen)
 
 img_file_names = [];
 ip_file_names = [];

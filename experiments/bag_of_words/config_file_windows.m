@@ -30,6 +30,8 @@ CODEBOOK_DIR = [ RUN_DIR, '/codebooks' ];
 
 IP_DIR = [ RUN_DIR, '/interest_points' ];
 
+TEST_DIR = [ RUN_DIR, '/test_images' ];
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% GLOBAL PARAMETERS
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

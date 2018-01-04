@@ -65,19 +65,44 @@ model_fname = [RUN_DIR,'/',Global.Model_Dir_Name,'/',Global.Model_File_Name,pref
 %%% load up model
 load(model_fname);
 
-%% get +ve interest point file names
-pos_ip_file_names = [];
-pos_sets = find(Categories.Labels==1);
-for a=1:length(pos_sets)
-    pos_ip_file_names =  [pos_ip_file_names , genFileNames({Global.Interest_Dir_Name},Categories.Test_Frames{pos_sets(a)},RUN_DIR,Global.Interest_File_Name,'.mat',Global.Num_Zeros)];
+%%
+
+% get all file names of test image interest point files
+temp_file_names = dir(TEST_DIR);
+temp_file_names = temp_file_names(3:end);
+test_file_names = [];
+for a=1:length(temp_file_names)
+    %pos_ip_file_names =  [pos_ip_file_names , ];
+    file_name = char(string(temp_file_names(a).folder) + "/" + string(temp_file_names(a).name));
+    test_file_names = [test_file_names; file_name];
 end
 
-%% get -ve interest point file names
-neg_ip_file_names = [];
-neg_sets = find(Categories.Labels==0);
-for a=1:length(neg_sets)
-    neg_ip_file_names =  [neg_ip_file_names , genFileNames({Global.Interest_Dir_Name},Categories.Test_Frames{neg_sets(a)},RUN_DIR,Global.Interest_File_Name,'.mat',Global.Num_Zeros)];
-end
+% Create matrix to hold word histograms from +ve images
+X = zeros(VQ.Codebook_Size,length(test_file_names));
+
+% load up all interest_point files which should have the histogram
+% variable already computed (performed by do_vq routine).
+classes = unique(Categories.Name);
+Y = cell(length(test_file_names),1);
+for a=1:length(test_file_names)
+    % load file
+    load(char(test_file_names(a,:)));
+    % store histogram
+    X(:,a) = histg';
+    % store labels
+    temp_Y = "none";
+    for n=1:length(classes)
+        if ground_truth == classes(n)
+            temp_Y = ground_truth;
+        end
+    end
+    Y(a) = cellstr(temp_Y);
+end 
+
+X = X';
+
+%%
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Test section - run model on testing images only if Pd_z_test does not exist
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
