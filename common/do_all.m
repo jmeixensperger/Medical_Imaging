@@ -31,36 +31,16 @@ try
 catch
 end
 
-if strcmp(EXPERIMENT_TYPE,'naive_bayes')
-  
-    %%% generate random indices for trainig and test frames
-    do_random_indices(config_file);
-    
-    %%% copy & resize images into experiment subdir
-    do_preprocessing(config_file);
-    
-    %%% run interest operator over images and obtain representation of interest points
-    do_interest_operator(config_file);
-
-    %%% form appearance codebook
-    do_form_codebook(config_file);
-    
-    %%% VQ appearance of regions
-    do_vq(config_file);
-    
-    %%% run naive_bayes to learn model
-    do_naive_bayes(config_file);
-    
-    %%% test model
-    do_naive_bayes_evaluation(config_file);   
-
-elseif strcmp(EXPERIMENT_TYPE,'svm')
-  
+tp_list = zeros(length(HEALTHY_PATIENTS),1);
+fp_list = zeros(length(HEALTHY_PATIENTS),1);
+fscore_list = zeros(length(HEALTHY_PATIENTS),1);
+roc_area_list = zeros(length(HEALTHY_PATIENTS),1);
+for i=1:length(HEALTHY_PATIENTS)
     %%% generate random indices for trainig and test frames
     %do_random_indices(config_file);
-    
+
     %%% copy & resize images into experiment subdir
-    do_preprocessing(config_file);
+    do_preprocessing(config_file,i);
 
     %%% run interest operator over images and obtain representation of interest points
     do_interest_operator(config_file);
@@ -75,9 +55,19 @@ elseif strcmp(EXPERIMENT_TYPE,'svm')
     do_svm(config_file);
 
     %%% test model
-    do_svm_evaluation(config_file);
-
-else
-    error('Unknown experiment type');
+    [tp, fp, fscore, roc_area] = do_svm_evaluation(config_file,i);
+    tp_list(i) = tp;
+    fp_list(i) = fp;
+    fscore_list(i) = fscore;
+    roc_area_list(i) = roc_area;
 end
+
+num_p = length(HEALTHY_PATIENTS);
+tp_avg = sum(tp_list) / num_p;
+fp_avg = sum(fp_list) / num_p;
+fscore_avg = sum(fscore_list) / num_p;
+roc_avg = sum(roc_area_list) / num_p;
+fprintf('Tested on: %d patients', num_p);
+fprintf('Averages:\nTruePos: %f \tFalsePos: %f \tFscore: %f \tROC Test Area: %f\n', ...
+    tp_avg, fp_avg, fscore_avg, roc_avg);
     

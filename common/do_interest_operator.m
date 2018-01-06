@@ -75,41 +75,41 @@ for i = 1 : Categories.Total_Frames
     file_folder = "";
     file_name = "";
     if cat_name == "healthy"
-        idx = uint16(rand() * (length(healthy)-2)) + 3;
+        idx = uint16(rand() * (length(healthy)-3)) + 3;
         while healthy(:,idx) == 1
-            idx = uint16(rand() * (length(healthy)-2)) + 3;
+            idx = uint16(rand() * (length(healthy)-3)) + 3;
         end
         healthy(:,idx) = 1;
         file_folder = string(dir_name(idx).folder) + '/';
         file_name = string(dir_name(idx).name);
     elseif cat_name == "emphysema"
-        idx = uint16(rand() * (length(emphysema)-2)) + 3;
+        idx = uint16(rand() * (length(emphysema)-3)) + 3;
         while emphysema(:,idx) == 1
-            idx = uint16(rand() * (length(emphysema)-2)) + 3;
+            idx = uint16(rand() * (length(emphysema)-3)) + 3;
         end
         emphysema(:,idx) = 1;
         file_folder = string(dir_name(idx).folder) + '/';
         file_name = string(dir_name(idx).name);
     elseif cat_name == "fibrosis"
-        idx = uint16(rand() * (length(fibrosis)-2)) + 3;
+        idx = uint16(rand() * (length(fibrosis)-3)) + 3;
         while fibrosis(:,idx) == 1
-            idx = uint16(rand() * (length(fibrosis)-2)) + 3;
+            idx = uint16(rand() * (length(fibrosis)-3)) + 3;
         end
         fibrosis(:,idx) = 1;
         file_folder = string(dir_name(idx).folder) + '/';
         file_name = string(dir_name(idx).name);
     elseif cat_name == "ground_glass"
-        idx = uint16(rand() * (length(ground_glass)-2)) + 3;
+        idx = uint16(rand() * (length(ground_glass)-3)) + 3;
         while ground_glass(:,idx) == 1
-            idx = uint16(rand() * (length(ground_glass)-2)) + 3;
+            idx = uint16(rand() * (length(ground_glass)-3)) + 3;
         end
         ground_glass(:,idx) = 1;
         file_folder = string(dir_name(idx).folder) + '/';
         file_name = string(dir_name(idx).name);
     elseif cat_name == "micronodules"
-        idx = uint16(rand() * (length(micronodules)-2)) + 3;
+        idx = uint16(rand() * (length(micronodules)-3)) + 3;
         while micronodules(:,idx) == 1
-            idx = uint16(rand() * (length(micronodules)-2)) + 3;
+            idx = uint16(rand() * (length(micronodules)-3)) + 3;
         end
         micronodules(:,idx) = 1;
         file_folder = string(dir_name(idx).folder) + '/';

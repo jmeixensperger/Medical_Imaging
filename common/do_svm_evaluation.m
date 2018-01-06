@@ -1,4 +1,4 @@
-function do_svm_evaluation(config_file)
+function [tp, fp, fscore, roc_area_test] = do_svm_evaluation(config_file,num)
 
 %% Test and plot graphs for a naive bayes classifier learnt with do_naive_bayes.m
 
@@ -171,46 +171,53 @@ X = X';
 
 %%
 classes = unique(Categories.Name);
-Scores = zeros(size(X,1),numel(classes));
-for i=1:numel(classes)
-    [~,score] = predict(SVMModels{i},X);
-    Scores(:,i) = score(:,2);
-end
-% Find max score (prediction for which class the ith image contains)
-[~,maxScore] = max(Scores,[],2);
+% Scores = zeros(size(X,1),numel(classes));
+% for i=1:numel(classes)
+%     [~,score] = predict(SVMModels{i},X);
+%     Scores(:,i) = score(:,2);
+% end
+% % Find max score (prediction for which class the ith image contains)
+% [~,maxScore] = max(Scores,[],2);
+[predictY, values] = predict(SVMModel,X);
+values = values(:,2)';
+labels = strcmp(Y,'healthy');
+
+%%% compute roc
+[roc_curve_test,roc_op_test,roc_area_test,roc_threshold_test] = roc([values;labels']');
+fprintf('Testing: Area under ROC curve = %f\n', roc_area_test);
 
 %%
 
-figure
-sub_classes = unique(Y);
-sub_count = 1;
-train_auc = zeros(numel(sub_classes),1);
-train_opt = zeros(numel(sub_classes),1);
-for i=1:numel(classes)
-    scores = double(zeros(size(maxScore,1),1));
-    indx = 0;
-    if sub_count <= length(sub_classes)
-        indx = strcmp(sub_classes(sub_count),classes(i));
-    end
-    for j=1:length(maxScore)
-        if maxScore(j) == i
-            scores(j) = 1;
-        end
-    end
-    if indx
-        [x, y, t, auc, opt] = perfcurve(Y, scores, classes(i));
-        train_auc(i) = auc;
-        % outputs two values?
-        train_opt(i) = opt(1);
-        fprintf('Training %s images: area under perf curve = %f\n', string(classes(i)), auc);
-        subplot(2,3,sub_count)
-        plot(x,y)
-        xlabel('False positive rate')
-        ylabel('True positive rate')
-        title(string(classes(i))+" ROC")
-        sub_count = sub_count + 1;
-    end
-end
+% figure
+% sub_classes = unique(Y);
+% sub_count = 1;
+% train_auc = zeros(numel(sub_classes),1);
+% train_opt = zeros(numel(sub_classes),1);
+% for i=1:numel(classes)
+%     scores = double(zeros(size(maxScore,1),1));
+%     indx = 0;
+%     if sub_count <= length(sub_classes)
+%         indx = strcmp(sub_classes(sub_count),classes(i));
+%     end
+%     for j=1:length(maxScore)
+%         if maxScore(j) == i
+%             scores(j) = 1;
+%         end
+%     end
+%     if indx
+%         [x, y, t, auc, opt] = perfcurve(Y, scores, classes(i));
+%         train_auc(i) = auc;
+%         % outputs two values?
+%         train_opt(i) = opt(1);
+%         fprintf('Training %s images: area under perf curve = %f\n', string(classes(i)), auc);
+%         subplot(2,3,sub_count)
+%         plot(x,y)
+%         xlabel('False positive rate')
+%         ylabel('True positive rate')
+%         title(string(classes(i))+" ROC")
+%         sub_count = sub_count + 1;
+%     end
+% end
 
 %%% save variables to file
 %save(model_fname,'Pc_d_pos_test','Pc_d_neg_test','roc_curve_test','roc_op_test','roc_area_test','roc_threshold_test','rpc_curve_test','rpc_ap_test','rpc_area_test','rpc_threshold_test','-append');
@@ -220,12 +227,6 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Plotting section - plot some figures to see what is going on...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%% We will use figures from FIGURE_BASE to FIGURE_BASE + 4;
-%% clear them ready for plotting action...
-for a=FIGURE_BASE:FIGURE_BASE+4
-    figure(a); clf;
-end
 
 % %% Now lets look at the classification performance
 % figure(FIGURE_BASE); hold on;
@@ -246,16 +247,22 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Now plot out example images
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-labels = zeros(size(Y,1),1);
-for i=1:size(Y,1)
-   for j=1:length(Categories.Name)
-       if string(Y(i)) == Categories.Name(j)
-           labels(i) = j;
-       end
-   end
-end
-% %%% use ratio of probabilities to avoid numerical issues
-values = maxScore;
+% labels = zeros(size(Y,1),1);
+% for i=1:size(Y,1)
+%    for j=1:length(Categories.Name)
+%        if string(Y(i)) == Categories.Name(j)
+%            labels(i) = j;
+%        end
+%    end
+% end
+% % %%% use ratio of probabilities to avoid numerical issues
+% values = maxScore;
+
+
+%% clear them ready for plotting action...
+% for a=FIGURE_BASE:FIGURE_BASE+4
+%     figure(a); clf;
+% end
 
 %% Get image filenames and ip filenames
 image_file_names = cell(size(temp_file_names,1),1);
@@ -308,34 +315,41 @@ ip_file_names = temp_file_names;
 % end 
    
 %% now setup figure and run loop plotting images
-figure(FIGURE_BASE+2);
+%figure(FIGURE_BASE+2);
 nImage_Per_Figure = prod(Plot.Number_Per_Figure);
+pos_count = 0;
+neg_count = 0;
+tp_count = 0;
+fp_count = 0;
 
-for a=1:nImage_Per_Figure:size(image_file_names,1)
+for a=1:size(ip_file_names,1)
     
-    clf; %% clear figure
-    for b=1:nImage_Per_Figure
+        b = mod(a,nImage_Per_Figure)+1;
+        if b == 1
+            %pause
+            %clf;
+        end
         %%% actual index
-        index = a+b-1;
+        index = a;
 
-        if index <= size(image_file_names,1)
-            %%% get correct subplot
-            subplot(Plot.Number_Per_Figure(1),Plot.Number_Per_Figure(2),b);
-
-    %         image_file_names{index}
             %%% load image
-             im=imread(char(image_file_names(index)));
-
-            %%% show image
-            imagesc(im); hold on;
-
-            %%% if grayscale, then adjust colormap
-            if (size(im,3)==1)
-                colormap(gray);
-            end 
-
+            im=imread(char(image_file_names(index)));
+            
             %%% load up interest_point file
             load(ip_file_names(index,:));
+            
+            %% Plot image
+            
+            %%% get correct subplot
+            %subplot(Plot.Number_Per_Figure(1),Plot.Number_Per_Figure(2),b);
+
+            %%% show image
+            %imagesc(im); hold on;
+
+            %%% if grayscale, then adjust colormap
+            %if (size(im,3)==1)
+            %    colormap(gray);
+            %end 
 
             %%% loop over all regions, plotting and coloring according to Pw_z
     %         for c=1:length(x)
@@ -351,22 +365,33 @@ for a=1:nImage_Per_Figure:size(image_file_names,1)
             %%% do we plot header information?
             if (Plot.Labels)
 
-                %% Label according to correct/incorrect classification
-                %% is image above ROC threshold?
-                imageIndex = (index);
-                if (values(index)==labels(index)) %% Correct classification    
+                above_threshold = (values(index)>roc_threshold_train);
+            
+                imageIndex = index;
+                if (above_threshold==labels(index)) %% Correct classification
+                    pos_count = pos_count + 1;
+                    if labels(index) == 1
+                        tp_count = tp_count + 1;
+                    end
                     %% show image number and Pz_d
-                    title(['Correct - Image: ',num2str(imageIndex)]);    
+                    %title(['Correct - Image: ',num2str(imageIndex)]);    
                 else
+                    neg_count = neg_count + 1;
+                    if labels(index) == 0
+                        fp_count = fp_count + 1;
+                    end
                     %% show image number and Pz_d
-                    title(['INCORRECT - Image: ',num2str(imageIndex)]);    
+                    %title(['INCORRECT - Image: ',num2str(imageIndex)]);    
                 end
 
-                fprintf('Image: %d \t Score: %f \t Threshold: %f\n',imageIndex,values(index),opt(1));
+                fprintf('Image: %d \t Score: %f\n',imageIndex,values(index));
             end
-        end
-       end
-
-       pause
     
-end 
+end
+
+%% Calculate TP/FP and f-score
+tp = tp_count / pos_count;
+fp = fp_count / neg_count;
+fscore = (2*tp*fp)/(tp+fp);
+fprintf('Test Patient: %s \t TruePos: %f \t FalsePos: %f \t F-Score: %f \t OptThresh: %f \t TestROCArea: %f\n', ...
+    HEALTHY_PATIENTS(num),tp,fp,fscore,roc_threshold_train,roc_area_test);

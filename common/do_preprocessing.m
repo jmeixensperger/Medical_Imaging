@@ -1,4 +1,4 @@
-function do_preprocessing(config_file)
+function do_preprocessing(config_file, num)
   
 %%% Function to copy the raw images for the source directory into the
 %%% directory for the experiment and perform various normalizations on them
@@ -30,6 +30,12 @@ eval(config_file);
 frame_counter = 0;
 test_counter = 0;
 
+outdir = char(string(RUN_DIR)+'/'+Global.Image_Dir_Name);
+if exist(outdir,'dir')
+    rmdir(outdir,'s');
+end
+mkdir(outdir);
+
 %%% make directory in experimental dir. for images
 [s,m1,m2]=mkdir(RUN_DIR,Global.Image_Dir_Name);
 
@@ -55,7 +61,7 @@ for pat = 1 : pat_range
       % Don't include test patient in training images - we will handle this
       % later
     num_processed = 0;
-    if exist(pat_dir, 'dir') && pat_num ~= TEST_PATIENT
+    if exist(pat_dir, 'dir') && pat_num ~= HEALTHY_PATIENTS(num)
        patients_processed = patients_processed + 1;
        for cat = 1 : Categories.Number
           %%% Generate filenames for images
@@ -84,7 +90,9 @@ for pat = 1 : pat_range
               end
 
               %%% Rescale image using bilinear scaling
-              im = imresize(im,scale_factor,Preprocessing.Rescale_Mode);
+              if scale_factor ~= 1
+                  im = imresize(im,scale_factor,Preprocessing.Rescale_Mode);
+              end
             else
               scale_factor = 1;
             end
@@ -94,13 +102,13 @@ for pat = 1 : pat_range
                 mkdir(outdir);
             end
             
+             %%% increment frame counter
+            frame_counter = frame_counter + 1;
+            num_processed = num_processed + 1;
+            
             %%% Now save out to directory.
             fname = char(string(RUN_DIR)+'/'+Global.Image_Dir_Name+'/'+Categories.Name(cat)+'/'+Global.Image_File_Name+prefZeros(frame_counter,Global.Num_Zeros)+Global.Image_Extension);
             imwrite(im,fname,Global.Image_Extension(2:end));
-
-            %%% increment frame counter
-            frame_counter = frame_counter + 1;
-            num_processed = num_processed + 1;
 
             if (mod(frame_counter,10)==0)
               fprintf('.');
@@ -110,7 +118,7 @@ for pat = 1 : pat_range
 
        end
       fprintf("\nPatient "+pat_num+": "+int2str(num_processed)+" images processed\tTotal: "+int2str(frame_counter)+"\n");
-    elseif pat_num == TEST_PATIENT % put test patient data into sub folder
+    elseif pat_num == HEALTHY_PATIENTS(num) % put test patient data into sub folder
         for cat = 1 : Categories.Number
           %%% Generate filenames for images
           in_file_names = dir(char(pat_dir+'/'+Categories.Name(cat)));

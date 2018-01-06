@@ -10,8 +10,11 @@
 %%% used by do_all.m
 EXPERIMENT_TYPE = 'svm';
 
-% Patient to test on
-TEST_PATIENT = "24";
+% Patients to test on
+HEALTHY_PATIENTS = ["-1_1", "-1_10", "-1_11", "-1_2", "-1_3"];
+% Test these patients next
+HEALTHY_PATIENTS = ["-1_4", "-1_5", ...
+    "-1_6", "104", "26", "28", "30", "48", "64", "99"];
 
 OS = "windows";
 
@@ -116,8 +119,8 @@ Categories.Labels = [ 1 0 ];
 
 %% Compute the total # categories and frames used
 Categories.Number = length(Categories.Name);
-%% Manually set the number of TRAINING images (limited by # of patients available)
-Categories.Total_Frames = 200;
+%% Manually set the number of TRAINING images (max ?= 2908)
+Categories.Total_Frames = 4708;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% IMAGE PREPROCESSING
@@ -125,7 +128,7 @@ Categories.Total_Frames = 200;
 
 %% Fixed size to which images are rescaled
 %% set to zero to leave images alone
-Preprocessing.Image_Size            = 64;
+Preprocessing.Image_Size            = 128;
 
 %% Which axis to use for the Image_Size parameter
 Preprocessing.Axis_For_Resizing     = 'x';

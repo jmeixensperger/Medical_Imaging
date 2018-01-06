@@ -61,49 +61,59 @@ end
 X = X';
 SVMModels = cell(5,1);
 classes = unique(Categories.Name);
-for i =1:numel(classes)
-    indx = strcmp(Y,classes(i));
-    SVMModels{i} = fitcsvm(X, indx, 'ClassNames', [false, true], 'Standardize', true, 'KernelFunction', 'rbf', 'OptimizeHyperparameters', 'auto');
-end
+% for i =1:numel(classes)
+%     indx = strcmp(Y,classes(i));
+%     SVMModels{i} = fitcsvm(X, indx, 'ClassNames', [false, true], 'Standardize', true, 'KernelFunction', 'rbf', 'OptimizeHyperparameters', 'auto');
+% end
+indx = strcmp(Y,'healthy');
+SVMModel = fitcsvm(X, indx, 'ClassNames', [false, true], 'Standardize', true, ...
+    'KernelFunction', 'rbf', 'BoxConstraint', 900, 'KernelScale', 400);
+    %'BoxConstraint', 1000, 'KernelScale', 500
 
-Scores = zeros(size(X,1),numel(classes));
-for i=1:numel(classes)
-    [~,score] = predict(SVMModels{i},X);
-    Scores(:,i) = score(:,2);
-end
-% Find max score (prediction for which class the ith image contains)
-[~,maxScore] = max(Scores,[],2);
+% Scores = zeros(size(X,1),numel(classes));
+% for i=1:numel(classes)
+%     [~,score] = predict(SVMModels{i},X);
+%     Scores(:,i) = score(:,2);
+% end
+% % Find max score (prediction for which class the ith image contains)
+% [~,maxScore] = max(Scores,[],2);
 
-%%
+[predictY, values] = predict(SVMModel,X);
 
-figure
-train_auc = zeros(numel(classes),1);
-train_opt = zeros(numel(classes),1);
-for i=1:numel(classes)
-    scores = double(zeros(size(maxScore,1),1));
-    for j=1:length(maxScore)
-        if maxScore(j) == i
-            scores(j) = 1;
-        end
-    end
-    [x, y, t, auc, opt] = perfcurve(Y, scores, classes(i));
-    train_auc(i) = auc;
-    % outputs two values?
-    train_opt(i) = opt(1);
-    fprintf('Training %s images: area under perf curve = %f\n', string(classes(i)), auc);
-    subplot(2,3,i)
-    plot(x,y)
-    xlabel('False positive rate')
-    ylabel('True positive rate')
-    title(string(classes(i))+" ROC")
-end
+%%% Compute ROC and RPC on training data
+labels = indx;
+values = values(:,2)';
 
 %%
 
-%%% compute roc
-%[roc_curve_train,roc_op_train,roc_area_train,roc_threshold_train] = roc([values;labels]');
-%fprintf('Training: Area under ROC curve = %f; Optimal threshold = %f\n', roc_area_train, roc_threshold_train);
-%%% compute rpc
+% figure
+% train_auc = zeros(numel(classes),1);
+% train_opt = zeros(numel(classes),1);
+% for i=1:numel(classes)
+%     scores = double(zeros(size(maxScore,1),1));
+%     for j=1:length(maxScore)
+%         if maxScore(j) == i
+%             scores(j) = 1;
+%         end
+%     end
+%     [x, y, t, auc, opt] = perfcurve(Y, scores, classes(i));
+%     train_auc(i) = auc;
+%     % outputs two values?
+%     train_opt(i) = opt(1);
+%     fprintf('Training %s images: area under perf curve = %f\n', string(classes(i)), auc);
+%     subplot(2,3,i)
+%     plot(x,y)
+%     xlabel('False positive rate')
+%     ylabel('True positive rate')
+%     title(string(classes(i))+" ROC")
+% end
+
+%%
+
+%% compute roc
+[roc_curve_train,roc_op_train,roc_area_train,roc_threshold_train] = roc([values;labels']');
+fprintf('Training: Area under ROC curve = %f; Optimal threshold = %f\n', roc_area_train, roc_threshold_train);
+%% compute rpc
 %[rpc_curve_train,rpc_ap_train,rpc_area_train,rpc_threshold_train] = recall_precision_curve([values;labels]',length(pos_ip_file_names));
 %fprintf('Training: Area under RPC curve = %f\n', rpc_area_train);
 
@@ -113,7 +123,7 @@ end
 [fname,model_ind] = get_new_model_name([RUN_DIR,'\',Global.Model_Dir_Name],Global.Num_Zeros);
 
 %%% save variables to file
-save(fname,'SVMModels','Y', 'train_auc', 'train_opt', 'maxScore');
+save(fname,'SVMModel','roc_curve_train','roc_op_train','roc_area_train','roc_threshold_train');
 
 %%% copy conf_file into models directory too..
 config_fname = which(config_file);
