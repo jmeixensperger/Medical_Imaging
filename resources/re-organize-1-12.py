@@ -4,7 +4,7 @@ import shutil
 def main() :
 	for i in range(1,13):
 		patientNum = "patient-1_" + str(i)
-		globalPath = "/Users/#ENTER_USER#/Desktop/Medical_Imaging/converted/"
+		globalPath = "C:/Users/wisbo/Documents/converted3/"
 		patientDirPath = globalPath + patientNum
 		patientPic = patientNum + ".jpg"
 		if not os.path.exists(patientDirPath):
@@ -26,6 +26,6 @@ def main() :
 					shutil.move( filePath, classDirPath )
 
 		if os.listdir( patientDirPath ) == []:
-			os.remove(patientDirPath)
+			os.rmdir(patientDirPath)
 
 main()

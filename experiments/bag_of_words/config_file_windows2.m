@@ -25,7 +25,7 @@ OS = "windows";
 RUN_DIR = [ 'C:/Users/wisbo/Desktop/Medical_Imaging/experiments/bag_of_words' ];
 
 %%% Directory holding all the source images
-IMAGE_DIR = [ 'C:/Users/wisbo/Documents/converted2' ];
+IMAGE_DIR = [ 'C:/Users/wisbo/Documents/converted3' ];
 
 %% Codebook directory - holds all VQ codebooks
 CODEBOOK_DIR = [ RUN_DIR, '/codebooks' ];

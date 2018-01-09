@@ -249,7 +249,7 @@ tp = tp_count / pos_count;
 fp = fp_count / neg_count;
 precision = tp / (tp + fp);
 fscore = 0;
-if tp ~= 0 || fp ~= 0
+if tp ~= 0
     fscore = (2 * tp * precision) / (tp + precision);
 end
 fprintf('Test Patient: %s \t TruePos: %f \t FalsePos: %f \t F-Score: %f \t OptThresh: %f \t TestROCArea: %f\n', ...
