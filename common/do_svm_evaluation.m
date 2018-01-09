@@ -99,76 +99,6 @@ end
 
 X = X';
 
-% %%
-% 
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% %% Test section - run model on testing images only if Pd_z_test does not exist
-% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% 
-% %if ~exist('Pc_d_pos_test') %%% only do this section the first time we look at the model
-%                        %%% saves time if we just want to look at the pretty
-%                        %%% figures
-% 
-% %% Create matrix to hold word histograms from +ve images
-% X_fg = zeros(VQ.Codebook_Size,length(pos_ip_file_names));
-% 
-% %% load up all interest_point files which should have the histogram
-% %% variable already computed (performed by do_vq routine).
-% for a=1:length(pos_ip_file_names)
-%     %% load file
-%     load(pos_ip_file_names{a});
-%     %% store histogram
-%     X_fg(:,a) = histg';    
-% end 
-% 
-% 
-% %% Create matrix to hold word histograms from +ve images
-% X_bg = zeros(VQ.Codebook_Size,length(neg_ip_file_names));
-% 
-% %% load up all interest_point files which should have the histogram
-% %% variable already computed (performed by do_vq routine).
-% for a=1:length(neg_ip_file_names)
-%     %% load file
-%     load(neg_ip_file_names{a});
-%     %% store histogram
-%     X_bg(:,a) = histg';    
-% end 
-% 
-% %% positive is index 1
-% %% negitive class is index 2
-% 
-% %%%% do everything in log-space for numerical reasons....
-% 
-% %%% positive model on positive test images
-% for a=1:length(pos_ip_file_names)
-%     Pc_d_pos_test(1,a) = log(class_priors(1)) + sum(X_fg(:,a) .* log(Pw_pos)); 
-% end
-% 
-% %%% negative model on positive test images
-% for a=1:length(pos_ip_file_names)
-%     Pc_d_pos_test(2,a) = log(class_priors(2)) + sum(X_fg(:,a) .* log(Pw_neg)); 
-% end
-% 
-% %%% would normalise Pc_d_pos if it wasn't for serious numerical issues is
-% %%% VQ.Codebook_Size is large, so just leave unnormalised.
-% 
-% %%% positive model on negative test images
-% for a=1:length(neg_ip_file_names)
-%     Pc_d_neg_test(1,a) = log(class_priors(1)) + sum(X_bg(:,a) .* log(Pw_pos)); 
-% end
-% 
-% %%% negative model on negitive test images
-% for a=1:length(neg_ip_file_names)
-%     Pc_d_neg_test(2,a) = log(class_priors(2)) + sum(X_bg(:,a) .* log(Pw_neg)); 
-% end
-% 
-% % Concatenate data
-% X = cat(2, X_fg, X_bg)';
-% Y = zeros(100,1);
-% for i=1:50
-%     Y(i) = 1;
-% end
-
 %%
 classes = unique(Categories.Name);
 % Scores = zeros(size(X,1),numel(classes));
@@ -180,89 +110,11 @@ classes = unique(Categories.Name);
 % [~,maxScore] = max(Scores,[],2);
 [predictY, values] = predict(SVMModel,X);
 values = values(:,2)';
-labels = strcmp(Y,'healthy');
+labels = strcmp(Y,'healthy')';
 
 %%% compute roc
-[roc_curve_test,roc_op_test,roc_area_test,roc_threshold_test] = roc([values;labels']');
+[roc_curve_test,roc_op_test,roc_area_test,roc_threshold_test] = roc([values;labels]');
 fprintf('Testing: Area under ROC curve = %f\n', roc_area_test);
-
-%%
-
-% figure
-% sub_classes = unique(Y);
-% sub_count = 1;
-% train_auc = zeros(numel(sub_classes),1);
-% train_opt = zeros(numel(sub_classes),1);
-% for i=1:numel(classes)
-%     scores = double(zeros(size(maxScore,1),1));
-%     indx = 0;
-%     if sub_count <= length(sub_classes)
-%         indx = strcmp(sub_classes(sub_count),classes(i));
-%     end
-%     for j=1:length(maxScore)
-%         if maxScore(j) == i
-%             scores(j) = 1;
-%         end
-%     end
-%     if indx
-%         [x, y, t, auc, opt] = perfcurve(Y, scores, classes(i));
-%         train_auc(i) = auc;
-%         % outputs two values?
-%         train_opt(i) = opt(1);
-%         fprintf('Training %s images: area under perf curve = %f\n', string(classes(i)), auc);
-%         subplot(2,3,sub_count)
-%         plot(x,y)
-%         xlabel('False positive rate')
-%         ylabel('True positive rate')
-%         title(string(classes(i))+" ROC")
-%         sub_count = sub_count + 1;
-%     end
-% end
-
-%%% save variables to file
-%save(model_fname,'Pc_d_pos_test','Pc_d_neg_test','roc_curve_test','roc_op_test','roc_area_test','roc_threshold_test','rpc_curve_test','rpc_ap_test','rpc_area_test','rpc_threshold_test','-append');
-    
-%end
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Plotting section - plot some figures to see what is going on...
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% %% Now lets look at the classification performance
-% figure(FIGURE_BASE); hold on;
-% plot(roc_curve_train(:,1),roc_curve_train(:,2),'r');
-% plot(roc_curve_test(:,1),roc_curve_test(:,2),'g');
-% axis([0 1 0 1]); axis square; grid on;
-% xlabel('P_{fa}'); ylabel('P_d'); title('ROC Curves');
-% legend('Train','Test');
-% 
-% %% Now lets look at the retrieval performance
-% figure(FIGURE_BASE+1); hold on;
-% plot(rpc_curve_train(:,1),rpc_curve_train(:,2),'r');
-% plot(rpc_curve_test(:,1),rpc_curve_test(:,2),'g');
-% axis([0 1 0 1]); axis square; grid on;
-% xlabel('Recall'); ylabel('Precision'); title('RPC Curves');
-% legend('Train','Test');
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% Now plot out example images
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% labels = zeros(size(Y,1),1);
-% for i=1:size(Y,1)
-%    for j=1:length(Categories.Name)
-%        if string(Y(i)) == Categories.Name(j)
-%            labels(i) = j;
-%        end
-%    end
-% end
-% % %%% use ratio of probabilities to avoid numerical issues
-% values = maxScore;
-
-
-%% clear them ready for plotting action...
-% for a=FIGURE_BASE:FIGURE_BASE+4
-%     figure(a); clf;
-% end
 
 %% Get image filenames and ip filenames
 image_file_names = cell(size(temp_file_names,1),1);
@@ -392,6 +244,7 @@ end
 %% Calculate TP/FP and f-score
 tp = tp_count / pos_count;
 fp = fp_count / neg_count;
-fscore = (2*tp*fp)/(tp+fp);
+precision = tp / (tp + fp);
+fscore = (2 * tp * precision) / (tp + precision);
 fprintf('Test Patient: %s \t TruePos: %f \t FalsePos: %f \t F-Score: %f \t OptThresh: %f \t TestROCArea: %f\n', ...
     HEALTHY_PATIENTS(num),tp,fp,fscore,roc_threshold_train,roc_area_test);

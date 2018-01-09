@@ -57,9 +57,14 @@ img_file_names = [];
 ip_file_names = [];
 img_dir = string(RUN_DIR) + '/' + string(Global.Image_Dir_Name);
 old_files = dir(char(IP_DIR + "/*.mat"));
-for i = 1 : length(old_files)
-   fn = char(string(old_files(i).folder) + '/' + string(old_files(i).name));
+for i = 1 : size(old_files,1)
+   fn = char(string(old_files(i).folder) + "/" + string(old_files(i).name));
    delete(fn); 
+end
+old_test_files = dir(char(TEST_DIR + "/*.mat"));
+for i = 1 : size(old_test_files,1)
+    fn = char(string(old_test_files(i).folder) + "/" + string(old_test_files(i).name));
+   delete(fn);
 end
 
 healthy = zeros(1,length(dir(char(img_dir + "/healthy"))));
@@ -139,7 +144,6 @@ if strcmp(Interest_Point.Type,'Edge_Sampling')
 elseif strcmp(Interest_Point.Type,'DoG')
   
   %% Laplacian of Gaussian method to obtain key points (implemented as difference of Gaussian)
-  % Now returns filter responses from MR8 filters
   DoG(img_file_names,ip_file_names);
   DoG(test_file_names,test_out_file_names);
 else

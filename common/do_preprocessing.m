@@ -30,11 +30,16 @@ eval(config_file);
 frame_counter = 0;
 test_counter = 0;
 
+%%% Remove 'images' and 'test_images' dirs
 outdir = char(string(RUN_DIR)+'/'+Global.Image_Dir_Name);
 if exist(outdir,'dir')
     rmdir(outdir,'s');
 end
 mkdir(outdir);
+outdir = char(TEST_DIR);
+if exist(outdir,'dir')
+    rmdir(outdir,'s');
+end
 
 %%% make directory in experimental dir. for images
 [s,m1,m2]=mkdir(RUN_DIR,Global.Image_Dir_Name);
@@ -120,43 +125,44 @@ for pat = 1 : pat_range
       fprintf("\nPatient "+pat_num+": "+int2str(num_processed)+" images processed\tTotal: "+int2str(frame_counter)+"\n");
     elseif pat_num == HEALTHY_PATIENTS(num) % put test patient data into sub folder
         for cat = 1 : Categories.Number
-          %%% Generate filenames for images
-          in_file_names = dir(char(pat_dir+'/'+Categories.Name(cat)));
-          for frame = 3:length(in_file_names)
-            file_name = string(in_file_names(frame).folder) + '/' + string(in_file_names(frame).name);
-            %%% read image in 
-            im = imread(char(file_name));
-
-            %%% find out size of image
-            [imy,imx,imz] = size(im);
-
-            %%% Resize image, proved Preprocessing.Image_Size isn't zero
-            %%% in which case, do nothing.
-            if (Preprocessing.Image_Size>0)
-
-              %%% Figure out scale factor for resizing along appropriate axis
-              if strcmp(Preprocessing.Axis_For_Resizing,'x')
-                scale_factor = Preprocessing.Image_Size / imx;
-              elseif strcmp(Preprocessing.Axis_For_Resizing,'y')
-                scale_factor = Preprocessing.Image_Size / imy;     
-              else
-                error('Unknown axis');
-              end
-
-              %%% Rescale image using bilinear scaling
-              im = imresize(im,scale_factor,Preprocessing.Rescale_Mode);
-            else
-              scale_factor = 1;
-            end
-
             cat_dir = char(string(TEST_DIR) + '/' + Categories.Name(cat));
-            if ~exist(cat_dir,'dir')
-                mkdir(cat_dir);
+            if exist(cat_dir,'dir')
+                rmdir(cat_dir,'s');
             end
-            test_counter = test_counter + 1;
-            %%% Now save out to directory.
-            fname = char(string(TEST_DIR)+'/'+Categories.Name(cat)+'/'+Global.Image_File_Name+prefZeros(test_counter,Global.Num_Zeros)+Global.Image_Extension);
-            imwrite(im,fname,Global.Image_Extension(2:end));
+            mkdir(cat_dir);
+          %%% Generate filenames for images
+            in_file_names = dir(char(pat_dir+'/'+Categories.Name(cat)));
+            for frame = 3:length(in_file_names)
+                file_name = string(in_file_names(frame).folder) + '/' + string(in_file_names(frame).name);
+                %%% read image in 
+                im = imread(char(file_name));
+
+                %%% find out size of image
+                [imy,imx,imz] = size(im);
+
+                %%% Resize image, proved Preprocessing.Image_Size isn't zero
+                %%% in which case, do nothing.
+                if (Preprocessing.Image_Size>0)
+
+                  %%% Figure out scale factor for resizing along appropriate axis
+                  if strcmp(Preprocessing.Axis_For_Resizing,'x')
+                    scale_factor = Preprocessing.Image_Size / imx;
+                  elseif strcmp(Preprocessing.Axis_For_Resizing,'y')
+                    scale_factor = Preprocessing.Image_Size / imy;     
+                  else
+                    error('Unknown axis');
+                  end
+
+                  %%% Rescale image using bilinear scaling
+                  im = imresize(im,scale_factor,Preprocessing.Rescale_Mode);
+                else
+                  scale_factor = 1;
+                end
+
+                test_counter = test_counter + 1;
+                %%% Now save out to directory.
+                fname = char(string(TEST_DIR)+'/'+Categories.Name(cat)+'/'+Global.Image_File_Name+prefZeros(test_counter,Global.Num_Zeros)+Global.Image_Extension);
+                imwrite(im,fname,Global.Image_Extension(2:end));
           end
         end
     end

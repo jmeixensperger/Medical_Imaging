@@ -38,14 +38,19 @@ for i = 1:nImages
   % From f and d extract x, y, scale, angle and descriptor.
   % The following code was used to extract SIFT features (no longer used):
   % Total number of features from image
-   [f,d] = vl_sift(imGray);
-   nFeats = size(f,2);
-   x = f(1,:);
-   y = f(2,:);
-   scale = f(3,:);
-   angle = f(4,:);
-   descriptor = d;
-   score = ones(1, nFeats);
+  if EXTRACTOR_TYPE == "sift"
+       [f,d] = vl_sift(imGray);
+       nFeats = size(f,2);
+       x = f(1,:);
+       y = f(2,:);
+       scale = f(3,:);
+       angle = f(4,:);
+       descriptor = d;
+       score = ones(1, nFeats);
+  else
+      % test hog, freak, surf, and other existing feature extractors
+      pass
+  end
 
    % save ground truth information
    ground_truth = "";
