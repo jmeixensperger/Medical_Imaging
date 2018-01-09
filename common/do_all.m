@@ -14,7 +14,7 @@ function do_all(config_file)
 %% Krystian Mikolajczyk (km@robots.ox.ac.uk). The rest of the code will
 %% run fine under Windows, so you will need alternative code to use in place
 %% of the SIFT descriptor binary if you intend to use it under
-%% Windows. Note that in the demos shown at ICCV, we copied the
+%% Windows. Note that in the d emos shown at ICCV, we copied the
 %% interest_point files onto our Windows laptops, having run the SIFT
 %% descriptor code on Linux machines. 
   

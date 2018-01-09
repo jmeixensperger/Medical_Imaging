@@ -144,8 +144,8 @@ if strcmp(Interest_Point.Type,'Edge_Sampling')
 elseif strcmp(Interest_Point.Type,'DoG')
   
   %% Laplacian of Gaussian method to obtain key points (implemented as difference of Gaussian)
-  DoG(img_file_names,ip_file_names);
-  DoG(test_file_names,test_out_file_names);
+  DoG(img_file_names,ip_file_names,EXTRACTOR_TYPE);
+  DoG(test_file_names,test_out_file_names,EXTRACTOR_TYPE);
 else
   error('Unknown type of operator');
 end

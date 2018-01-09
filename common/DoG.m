@@ -1,4 +1,4 @@
-function DoG(image_file_names,output_file_names)
+function DoG(image_file_names,output_file_names,extractor_type)
 
   %% Simple interest operator that:
   %%    1. Runs difference of Gaussian operator on image using VL FEAT package.
@@ -38,7 +38,7 @@ for i = 1:nImages
   % From f and d extract x, y, scale, angle and descriptor.
   % The following code was used to extract SIFT features (no longer used):
   % Total number of features from image
-  if EXTRACTOR_TYPE == "sift"
+  if extractor_type == "sift"
        [f,d] = vl_sift(imGray);
        nFeats = size(f,2);
        x = f(1,:);

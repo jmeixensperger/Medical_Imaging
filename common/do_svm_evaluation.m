@@ -218,17 +218,20 @@ for a=1:size(ip_file_names,1)
             if (Plot.Labels)
 
                 above_threshold = (values(index)>roc_threshold_train);
-            
+                if labels(index) == 1
+                    pos_count = pos_count + 1;
+                else
+                    neg_count = neg_count + 1;
+                end
+                
                 imageIndex = index;
                 if (above_threshold==labels(index)) %% Correct classification
-                    pos_count = pos_count + 1;
                     if labels(index) == 1
                         tp_count = tp_count + 1;
                     end
                     %% show image number and Pz_d
                     %title(['Correct - Image: ',num2str(imageIndex)]);    
                 else
-                    neg_count = neg_count + 1;
                     if labels(index) == 0
                         fp_count = fp_count + 1;
                     end
@@ -245,6 +248,9 @@ end
 tp = tp_count / pos_count;
 fp = fp_count / neg_count;
 precision = tp / (tp + fp);
-fscore = (2 * tp * precision) / (tp + precision);
+fscore = 0;
+if tp ~= 0 || fp ~= 0
+    fscore = (2 * tp * precision) / (tp + precision);
+end
 fprintf('Test Patient: %s \t TruePos: %f \t FalsePos: %f \t F-Score: %f \t OptThresh: %f \t TestROCArea: %f\n', ...
     HEALTHY_PATIENTS(num),tp,fp,fscore,roc_threshold_train,roc_area_test);

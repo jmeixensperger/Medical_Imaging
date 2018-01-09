@@ -11,8 +11,6 @@
 EXPERIMENT_TYPE = 'svm';
 
 % Patients to test on
-HEALTHY_PATIENTS = ["-1_10", "-1_11", "-1_2", "-1_3", "-1_4", "-1_5", "-1_6", "104", "26", "28", "30", "48", "64", "99"];
-% Test these patients next
 HEALTHY_PATIENTS = ["-1_3", "-1_5", "-1_10", "-1_11", "26", "30", "64"];
 
 EXTRACTOR_TYPE = "sift";
