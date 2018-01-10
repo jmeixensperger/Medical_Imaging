@@ -1,4 +1,4 @@
-function do_preprocessing(config_file)
+function do_preprocessing(config_file, num)
   
 %%% Function to copy the raw images for the source directory into the
 %%% directory for the experiment and perform various normalizations on them
@@ -27,7 +27,19 @@ function do_preprocessing(config_file)
 eval(config_file);
 
 %%% reset frame counter
-frame_counter = 1;
+frame_counter = 0;
+test_counter = 0;
+
+%%% Remove 'images' and 'test_images' dirs
+outdir = char(string(RUN_DIR)+'/'+Global.Image_Dir_Name);
+if exist(outdir,'dir')
+    rmdir(outdir,'s');
+end
+mkdir(outdir);
+outdir = char(TEST_DIR);
+if exist(outdir,'dir')
+    rmdir(outdir,'s');
+end
 
 %%% make directory in experimental dir. for images
 [s,m1,m2]=mkdir(RUN_DIR,Global.Image_Dir_Name);
@@ -37,9 +49,9 @@ files = dir(IMAGE_DIR);
 dirFlags = [files.isdir];
 subFolders = files(dirFlags);
 
-pat_range = 148;
+pat_range = 149;
 pat_offset = 13;
-
+patients_processed = 0;
 for pat = 1 : pat_range
     pat_num = "";
     if pat < pat_offset
@@ -47,31 +59,18 @@ for pat = 1 : pat_range
     else
         pat_num = int2str(pat - pat_offset);
     end
-    for cat = 1 : Categories.Number
       
-      pat_dir = IMAGE_DIR + "/patient" + pat_num;
+    pat_dir = IMAGE_DIR + "/patient" + pat_num;
       
       % Check that our patient exists before trying to load files
       % Don't include test patient in training images - we will handle this
       % later
-      if exist(pat_dir, 'dir') && pat_num ~= TEST_PATIENT
-
+    num_processed = 0;
+    if exist(pat_dir, 'dir') && pat_num ~= HEALTHY_PATIENTS(num)
+       patients_processed = patients_processed + 1;
+       for cat = 1 : Categories.Number
           %%% Generate filenames for images
           in_file_names = dir(char(pat_dir+'/'+Categories.Name(cat)));
-          
-          %%% load up gronud truth location file (it exists)
-          %ground_truth_loc = pat_dir + '/' + Categories.Name{cat} + '/' + Global.Ground_Truth_Name + '.mat';
-          %if (exist(ground_truth_loc, 'file'))
-            %% load up file
-            %load([IMAGE_DIR,'/',"patient"+pat_num+Categories.Name{cat},'/',Global.Ground_Truth_Name,'.mat']);
-            %% copy the variable held in file
-            %gt_bounding_boxes_original = gt_bounding_boxes;
-            %clear gt_bounding_boxes; %% clear original
-            %% set flag
-            %location_information_present = 1;    
-          %else
-            %location_information_present = 0;
-          %end
 
           for frame = 3:length(in_file_names)
 
@@ -96,42 +95,75 @@ for pat = 1 : pat_range
               end
 
               %%% Rescale image using bilinear scaling
-              im = imresize(im,scale_factor,Preprocessing.Rescale_Mode);
+              if scale_factor ~= 1
+                  im = imresize(im,scale_factor,Preprocessing.Rescale_Mode);
+              end
             else
               scale_factor = 1;
             end
-
-            %%% resize ground truth location information
-            %if (location_information_present)
-            %  gt_bounding_boxes{frame} = gt_bounding_boxes_original{frame} * scale_factor;
-            %end
 
             outdir = char(string(RUN_DIR)+'/'+Global.Image_Dir_Name+'/'+Categories.Name(cat));
             if ~exist(outdir,'dir')
                 mkdir(outdir);
             end
             
+             %%% increment frame counter
+            frame_counter = frame_counter + 1;
+            num_processed = num_processed + 1;
+            
             %%% Now save out to directory.
             fname = char(string(RUN_DIR)+'/'+Global.Image_Dir_Name+'/'+Categories.Name(cat)+'/'+Global.Image_File_Name+prefZeros(frame_counter,Global.Num_Zeros)+Global.Image_Extension);
             imwrite(im,fname,Global.Image_Extension(2:end));
 
-            %%% increment frame counter
-            frame_counter = frame_counter + 1;
-
             if (mod(frame_counter,10)==0)
-              fprintf('.%d',frame_counter);
+              fprintf('.');
             end
 
           end
 
-          %if (location_information_present)  
-            %% Now save rescaled ground truth information to RUNDIR, using class
-            %% name as tag (since we mgiht have several classes with gt_location information).
-            %fn = [RUN_DIR,'/',Global.Ground_Truth_Name,'_',Categories.Name{cat},'.mat'];
-            %save(fn,'gt_bounding_boxes');
-          %end
+       end
+      fprintf("\nPatient "+pat_num+": "+int2str(num_processed)+" images processed\tTotal: "+int2str(frame_counter)+"\n");
+    elseif pat_num == HEALTHY_PATIENTS(num) % put test patient data into sub folder
+        for cat = 1 : Categories.Number
+            cat_dir = char(string(TEST_DIR) + '/' + Categories.Name(cat));
+            if exist(cat_dir,'dir')
+                rmdir(cat_dir,'s');
+            end
+            mkdir(cat_dir);
+          %%% Generate filenames for images
+            in_file_names = dir(char(pat_dir+'/'+Categories.Name(cat)));
+            for frame = 3:length(in_file_names)
+                file_name = string(in_file_names(frame).folder) + '/' + string(in_file_names(frame).name);
+                %%% read image in 
+                im = imread(char(file_name));
 
-          fprintf('\n');
-      end
+                %%% find out size of image
+                [imy,imx,imz] = size(im);
+
+                %%% Resize image, proved Preprocessing.Image_Size isn't zero
+                %%% in which case, do nothing.
+                if (Preprocessing.Image_Size>0)
+
+                  %%% Figure out scale factor for resizing along appropriate axis
+                  if strcmp(Preprocessing.Axis_For_Resizing,'x')
+                    scale_factor = Preprocessing.Image_Size / imx;
+                  elseif strcmp(Preprocessing.Axis_For_Resizing,'y')
+                    scale_factor = Preprocessing.Image_Size / imy;     
+                  else
+                    error('Unknown axis');
+                  end
+
+                  %%% Rescale image using bilinear scaling
+                  im = imresize(im,scale_factor,Preprocessing.Rescale_Mode);
+                else
+                  scale_factor = 1;
+                end
+
+                test_counter = test_counter + 1;
+                %%% Now save out to directory.
+                fname = char(string(TEST_DIR)+'/'+Categories.Name(cat)+'/'+Global.Image_File_Name+prefZeros(test_counter,Global.Num_Zeros)+Global.Image_Extension);
+                imwrite(im,fname,Global.Image_Extension(2:end));
+          end
+        end
     end
 end

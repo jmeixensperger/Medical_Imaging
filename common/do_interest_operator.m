@@ -26,29 +26,105 @@ eval(config_file);
 %% Create directories for interest points
 [s,m1,m2]=mkdir(RUN_DIR,Global.Interest_Dir_Name);
 
-%% Get list of file name of input images
-% Edit Total_Frames in config file to change number of training images that
-% get generated here
-%genFileNames({Global.Image_Dir_Name},[1:Categories.Total_Frames],RUN_DIR,Global.Image_File_Name,Global.Image_Extension,Global.Num_Zeros);
-
-img_file_names = [];
-ip_file_names = [];
-img_dir = string(RUN_DIR) + '/' + string(Global.Image_Dir_Name);
-old_files = dir(char(img_dir + '/*.mat'));
+%% Perform interest operator on testing images
+test_file_names = [];
+test_out_file_names = [];
+old_files = dir(char(TEST_DIR + "/*.mat"));
 for i = 1 : length(old_files)
    fn = char(string(old_files(i).folder) + '/' + string(old_files(i).name));
    delete(fn); 
 end
-search_str = img_dir + '/*.jpg';
-chosen = zeros(1,length(dir(char(search_str))) - 2);
-for i = 1 : Categories.Total_Frames
-    idx = uint16(rand() * (length(chosen)-1)) + 1;
-    while chosen(:,idx) == 1
-        idx = uint8(rand() * (length(chosen)-1)) + 1;
+
+for i = 1 : length(Categories.Name)
+    cat_dir = char(TEST_DIR + "/" + Categories.Name(i));
+    listing = dir(cat_dir);
+    file_folder = "";
+    file_name = "";
+    for j = 3:length(listing)
+        file_folder = string(listing(j).folder) + '/';
+        file_name = string(listing(j).name);
+        test_file_names = [test_file_names; file_folder + file_name];
+        file_name = strip(file_name, 'right', 'g');
+        file_name = strip(file_name, 'right', 'p');
+        file_name = strip(file_name, 'right', 'j');
+        test_out_file_names = [test_out_file_names; TEST_DIR + "/" + file_name + "mat"];
     end
-    chosen(:,idx) = 1;
-    img_file_names = [img_file_names; char(img_dir + '/' + Global.Image_File_Name + prefZeros(idx, 4) + '.jpg')];
-    ip_file_names = [ip_file_names; char(string(RUN_DIR) + '/' + Global.Interest_Dir_Name + '/' + Global.Image_File_Name + prefZeros(idx, 4) + '.mat')];
+end
+
+%% Perform interest operator on training images (randomly chosen)
+
+img_file_names = [];
+ip_file_names = [];
+img_dir = string(RUN_DIR) + '/' + string(Global.Image_Dir_Name);
+old_files = dir(char(IP_DIR + "/*.mat"));
+for i = 1 : size(old_files,1)
+   fn = char(string(old_files(i).folder) + "/" + string(old_files(i).name));
+   delete(fn); 
+end
+old_test_files = dir(char(TEST_DIR + "/*.mat"));
+for i = 1 : size(old_test_files,1)
+    fn = char(string(old_test_files(i).folder) + "/" + string(old_test_files(i).name));
+   delete(fn);
+end
+
+healthy = zeros(1,length(dir(char(img_dir + "/healthy"))));
+emphysema = zeros(1,length(dir(char(img_dir + "/emphysema"))));
+fibrosis = zeros(1,length(dir(char(img_dir + "/fibrosis"))));
+ground_glass = zeros(1,length(dir(char(img_dir + "/ground_glass"))));
+micronodules = zeros(1,length(dir(char(img_dir + "/micronodules"))));
+for i = 1 : Categories.Total_Frames
+    cat_num = mod(i, length(Categories.Name)) + 1;
+    cat_name = char(Categories.Name(cat_num));
+    dir_name = dir(char(img_dir + '/' + cat_name));
+    dir_length = length(dir_name);
+    file_folder = "";
+    file_name = "";
+    if cat_name == "healthy"
+        idx = uint16(rand() * (length(healthy)-3)) + 3;
+        while healthy(:,idx) == 1
+            idx = uint16(rand() * (length(healthy)-3)) + 3;
+        end
+        healthy(:,idx) = 1;
+        file_folder = string(dir_name(idx).folder) + '/';
+        file_name = string(dir_name(idx).name);
+    elseif cat_name == "emphysema"
+        idx = uint16(rand() * (length(emphysema)-3)) + 3;
+        while emphysema(:,idx) == 1
+            idx = uint16(rand() * (length(emphysema)-3)) + 3;
+        end
+        emphysema(:,idx) = 1;
+        file_folder = string(dir_name(idx).folder) + '/';
+        file_name = string(dir_name(idx).name);
+    elseif cat_name == "fibrosis"
+        idx = uint16(rand() * (length(fibrosis)-3)) + 3;
+        while fibrosis(:,idx) == 1
+            idx = uint16(rand() * (length(fibrosis)-3)) + 3;
+        end
+        fibrosis(:,idx) = 1;
+        file_folder = string(dir_name(idx).folder) + '/';
+        file_name = string(dir_name(idx).name);
+    elseif cat_name == "ground_glass"
+        idx = uint16(rand() * (length(ground_glass)-3)) + 3;
+        while ground_glass(:,idx) == 1
+            idx = uint16(rand() * (length(ground_glass)-3)) + 3;
+        end
+        ground_glass(:,idx) = 1;
+        file_folder = string(dir_name(idx).folder) + '/';
+        file_name = string(dir_name(idx).name);
+    elseif cat_name == "micronodules"
+        idx = uint16(rand() * (length(micronodules)-3)) + 3;
+        while micronodules(:,idx) == 1
+            idx = uint16(rand() * (length(micronodules)-3)) + 3;
+        end
+        micronodules(:,idx) = 1;
+        file_folder = string(dir_name(idx).folder) + '/';
+        file_name = string(dir_name(idx).name);
+    end
+    img_file_names = [img_file_names; file_folder + file_name];
+    file_name = strip(file_name, 'right', 'g');
+    file_name = strip(file_name, 'right', 'p');
+    file_name = strip(file_name, 'right', 'j');
+    ip_file_names = [ip_file_names; IP_DIR + "/" + file_name + "mat"];
 end
  
 %% Get list of output file names
@@ -63,19 +139,20 @@ if strcmp(Interest_Point.Type,'Edge_Sampling')
 
   %%% Edge Sampling: simple, crude interest operator.
   Edge_Sampling(img_file_names,ip_file_names,Interest_Point);
+  Edge_Sampling(test_file_names,test_out_file_names,Interest_Point);
   
 elseif strcmp(Interest_Point.Type,'DoG')
   
   %% Laplacian of Gaussian method to obtain key points (implemented as difference of Gaussian)
-  % Now returns filter responses from MR8 filters
-  DoG(img_file_names,ip_file_names);
+  DoG(img_file_names,ip_file_names,EXTRACTOR_TYPE);
+  DoG(test_file_names,test_out_file_names,EXTRACTOR_TYPE);
 else
   error('Unknown type of operator');
 end
 
 total_time=toc;
 fn = [RUN_DIR,'/training.mat'];
-save(fn,'img_file_names','ip_file_names');
+save(fn,'img_file_names','ip_file_names','test_file_names','test_out_file_names');
 
 fprintf('\nFinished running interest point operator\n');
 fprintf('Total number of images: %d, mean time per image: %f secs\n',Categories.Total_Frames,total_time/Categories.Total_Frames);

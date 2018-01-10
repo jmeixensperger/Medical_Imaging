@@ -49,6 +49,56 @@ nImages = Categories.Total_Frames;
 codebook_name = [CODEBOOK_DIR , '/', VQ.Codebook_Type ,'_', num2str(VQ.Codebook_Size) , '.mat'];
 load(codebook_name);
 
+%% Do vq on test images
+
+tic;
+  
+  %%% Loop over all images....
+  for i=1:length(test_out_file_names)
+    
+    if (mod(i,10)==0)
+      fprintf('.%d',i);
+    end
+    
+    %%% Load up interest point file
+    load(test_out_file_names(i,:));
+    
+    %%% Find number of points per image
+    nPoints = length(scale);
+%     fprintf('Points %d = %d\n', i, nPoints);
+    %%% Set distance matrix to all be large values
+    distance = Inf * ones(nPoints,VQ.Codebook_Size);
+    
+    %%% Loop over all centers and all points and get L2 norm btw. the two.
+    for p = 1:nPoints
+      for c = 1:VQ.Codebook_Size
+        distance(p,c) = norm(centers(:,c) - double(descriptor(:,p)));
+      end
+    end
+    
+    %%% Now find the closest center for each point
+    [tmp,descriptor_vq] = min(distance,[],2);
+
+    %%% Now compute histogram over codebook entries for image
+    histg = zeros(1,VQ.Codebook_Size);
+    
+    for p = 1:nPoints
+      histg(descriptor_vq(p)) = histg(descriptor_vq(p)) + 1;
+    end
+        
+    
+    %%% transpose to match other variables
+    descriptor_vq = descriptor_vq';
+    
+    %%% append descriptor_vq variable to file....
+    save(test_out_file_names(i,:),'descriptor_vq','histg','-append');
+    
+  end
+  
+total_time=toc;
+
+%% Now do vq on training images
+
 tic;
   
   %%% Loop over all images....
