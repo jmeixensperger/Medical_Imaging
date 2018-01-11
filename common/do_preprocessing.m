@@ -52,6 +52,7 @@ subFolders = files(dirFlags);
 pat_range = 149;
 pat_offset = 13;
 patients_processed = 0;
+fprintf("Performing do_preprocessing on test/training images");
 for pat = 1 : pat_range
     pat_num = "";
     if pat < pat_offset
@@ -67,6 +68,7 @@ for pat = 1 : pat_range
       % later
     num_processed = 0;
     if exist(pat_dir, 'dir') && pat_num ~= HEALTHY_PATIENTS(num)
+       fprintf("Patient %s: ", pat_num);
        patients_processed = patients_processed + 1;
        for cat = 1 : Categories.Number
           %%% Generate filenames for images
@@ -95,9 +97,7 @@ for pat = 1 : pat_range
               end
 
               %%% Rescale image using bilinear scaling
-              if scale_factor ~= 1
-                  im = imresize(im,scale_factor,Preprocessing.Rescale_Mode);
-              end
+              im = imresize(im,scale_factor,Preprocessing.Rescale_Mode);
             else
               scale_factor = 1;
             end
@@ -115,15 +115,17 @@ for pat = 1 : pat_range
             fname = char(string(RUN_DIR)+'/'+Global.Image_Dir_Name+'/'+Categories.Name(cat)+'/'+Global.Image_File_Name+prefZeros(frame_counter,Global.Num_Zeros)+Global.Image_Extension);
             imwrite(im,fname,Global.Image_Extension(2:end));
 
-            if (mod(frame_counter,10)==0)
-              fprintf('.');
-            end
+            %if (mod(frame_counter,10)==0)
+            %  fprintf('.');
+            %end
 
           end
 
        end
-      fprintf("\nPatient "+pat_num+": "+int2str(num_processed)+" images processed\tTotal: "+int2str(frame_counter)+"\n");
+       fprintf("DONE\n");
+      %fprintf("\nPatient "+pat_num+": "+int2str(num_processed)+" images processed\tTotal: "+int2str(frame_counter)+"\n");
     elseif pat_num == HEALTHY_PATIENTS(num) % put test patient data into sub folder
+        fprintf("Patient %s: ", pat_num);
         for cat = 1 : Categories.Number
             cat_dir = char(string(TEST_DIR) + '/' + Categories.Name(cat));
             if exist(cat_dir,'dir')
@@ -163,7 +165,9 @@ for pat = 1 : pat_range
                 %%% Now save out to directory.
                 fname = char(string(TEST_DIR)+'/'+Categories.Name(cat)+'/'+Global.Image_File_Name+prefZeros(test_counter,Global.Num_Zeros)+Global.Image_Extension);
                 imwrite(im,fname,Global.Image_Extension(2:end));
+                
           end
         end
+        fprintf("DONE\n");
     end
 end

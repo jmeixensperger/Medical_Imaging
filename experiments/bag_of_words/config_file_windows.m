@@ -11,9 +11,9 @@
 EXPERIMENT_TYPE = 'svm';
 
 % Patients to test on
-HEALTHY_PATIENTS = ["-1_3", "-1_5", "-1_10", "-1_11", "26", "30", "64"];
+HEALTHY_PATIENTS = ["-1_3", "-1_5", "-1_11", "26", "30", "64"];
 
-EXTRACTOR_TYPE = "sift";
+EXTRACTOR_TYPE = "filter_banks";
 
 OS = "windows";
 
@@ -25,7 +25,7 @@ OS = "windows";
 RUN_DIR = [ 'C:/Users/wisbo/Desktop/Medical_Imaging/experiments/bag_of_words' ];
 
 %%% Directory holding all the source images
-IMAGE_DIR = [ 'C:/Users/wisbo/Documents/converted2' ];
+IMAGE_DIR = [ 'C:/Users/wisbo/Documents/converted' ];
 
 %% Codebook directory - holds all VQ codebooks
 CODEBOOK_DIR = [ RUN_DIR, '/codebooks' ];
@@ -119,7 +119,7 @@ Categories.Labels = [ 1 0 ];
 %% Compute the total # categories and frames used
 Categories.Number = length(Categories.Name);
 %% Manually set the number of TRAINING images (max ?= 2908)
-Categories.Total_Frames = 4708;
+Categories.Total_Frames = 4709;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% IMAGE PREPROCESSING
@@ -127,7 +127,7 @@ Categories.Total_Frames = 4708;
 
 %% Fixed size to which images are rescaled
 %% set to zero to leave images alone
-Preprocessing.Image_Size            = 128;
+Preprocessing.Image_Size            = 32;
 
 %% Which axis to use for the Image_Size parameter
 Preprocessing.Axis_For_Resizing     = 'x';
@@ -165,7 +165,7 @@ VQ.Codebook_Size                 = 300;
 VQ.Max_Iterations                = 10;
 
 %% Verbosity level of k-means
-VQ.Verbosity                     = 0;
+VQ.Verbosity                     = 1;
 
 
 

@@ -27,6 +27,7 @@ eval(config_file);
 [s,m1,m2]=mkdir(RUN_DIR,Global.Interest_Dir_Name);
 
 %% Perform interest operator on testing images
+fprintf("Performing interest operator on testing images...\n");
 test_file_names = [];
 test_out_file_names = [];
 old_files = dir(char(TEST_DIR + "/*.mat"));
@@ -52,7 +53,7 @@ for i = 1 : length(Categories.Name)
 end
 
 %% Perform interest operator on training images (randomly chosen)
-
+fprintf("Performing interest operator on training images...\n");
 img_file_names = [];
 ip_file_names = [];
 img_dir = string(RUN_DIR) + '/' + string(Global.Image_Dir_Name);
@@ -142,7 +143,7 @@ if strcmp(Interest_Point.Type,'Edge_Sampling')
   Edge_Sampling(test_file_names,test_out_file_names,Interest_Point);
   
 elseif strcmp(Interest_Point.Type,'DoG')
-  
+  fprintf("Obtaining features with DoG...\n");
   %% Laplacian of Gaussian method to obtain key points (implemented as difference of Gaussian)
   DoG(img_file_names,ip_file_names,EXTRACTOR_TYPE);
   DoG(test_file_names,test_out_file_names,EXTRACTOR_TYPE);

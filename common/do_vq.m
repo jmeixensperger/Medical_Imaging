@@ -56,7 +56,7 @@ tic;
   %%% Loop over all images....
   for i=1:length(test_out_file_names)
     
-    if (mod(i,10)==0)
+    if (mod(i,50)==0)
       fprintf('.%d',i);
     end
     
@@ -64,17 +64,17 @@ tic;
     load(test_out_file_names(i,:));
     
     %%% Find number of points per image
-    nPoints = length(scale);
-%     fprintf('Points %d = %d\n', i, nPoints);
+    nPoints = size(descriptor,2);
+    % fprintf('Points %d = %d\n', i, nPoints);
     %%% Set distance matrix to all be large values
     distance = Inf * ones(nPoints,VQ.Codebook_Size);
-    
+
     %%% Loop over all centers and all points and get L2 norm btw. the two.
     for p = 1:nPoints
       for c = 1:VQ.Codebook_Size
         distance(p,c) = norm(centers(:,c) - double(descriptor(:,p)));
       end
-    end
+    end        
     
     %%% Now find the closest center for each point
     [tmp,descriptor_vq] = min(distance,[],2);
@@ -104,7 +104,7 @@ tic;
   %%% Loop over all images....
   for i=1:nImages
     
-    if (mod(i,10)==0)
+    if (mod(i,500)==0)
       fprintf('.%d',i);
     end
     
@@ -112,7 +112,7 @@ tic;
     load(ip_file_names(i,:));
     
     %%% Find number of points per image
-    nPoints = length(scale);
+    nPoints = size(descriptor,2);
 %     fprintf('Points %d = %d\n', i, nPoints);
     %%% Set distance matrix to all be large values
     distance = Inf * ones(nPoints,VQ.Codebook_Size);

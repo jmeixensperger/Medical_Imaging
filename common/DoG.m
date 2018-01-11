@@ -20,6 +20,7 @@ function DoG(image_file_names,output_file_names,extractor_type)
   
 %%% Get total number of images
 nImages = length(image_file_names);
+fprintf("Performing interest operator on %d images", nImages);
 
 %%% Loop over all images
 for i = 1:nImages
@@ -29,30 +30,12 @@ for i = 1:nImages
   
   % read in ith image
   im = imread(filestr);
+  [rows, cols] = size(im);
 
   % Convert to single, grayscale image
-  imGray = single(rgb2gray(im));
-
-  %features = MR8fast(imGray);
+  imGray = rgb2gray(im);
   
-  % From f and d extract x, y, scale, angle and descriptor.
-  % The following code was used to extract SIFT features (no longer used):
-  % Total number of features from image
-  if extractor_type == "sift"
-       [f,d] = vl_sift(imGray);
-       nFeats = size(f,2);
-       x = f(1,:);
-       y = f(2,:);
-       scale = f(3,:);
-       angle = f(4,:);
-       descriptor = d;
-       score = ones(1, nFeats);
-  else
-      % test hog, freak, surf, and other existing feature extractors
-      pass
-  end
-
-   % save ground truth information
+  % save ground truth information
    ground_truth = "";
    if contains(filestr,"healthy")
        ground_truth = "healthy";
@@ -65,13 +48,32 @@ for i = 1:nImages
    elseif contains(filestr,"ground_glass")
        ground_truth = "ground_glass";
    end
-
-  fprintf('Image: %d, Number of features detected: %d\n',i,length(x));
-  % Save in output file
-  save(output_file_names(i,:),'x','y','scale','angle','descriptor','score','ground_truth');
   
-   %%% print out progress every 10 images    
-   if (mod(i,10)==0)
+  % From f and d extract x, y, scale, angle and descriptor.
+  % The following code was used to extract SIFT features (no longer used):
+  % Total number of features from image
+  if extractor_type == "sift"
+        imGray = single(imGray);
+        [f,d] = vl_sift(imGray);
+        nFeats = size(f,2);
+        x = f(1,:);
+        y = f(2,:);
+        scale = f(3,:);
+        angle = f(4,:);
+        descriptor = d;
+        score = ones(1, nFeats);
+        save(output_file_names(i,:),'x','y','scale','angle','descriptor','score','ground_truth');
+        fprintf('Image: %d, Number of features detected: %d\n',i,length(x));
+  elseif extractor_type == "filter_banks"
+        %test hog, freak, surf, and other existing feature extractors
+        descriptor = MRS4fast(imGray)';
+        x = floor(i / cols) + 1;
+        y = mod(i,rows) + 1;
+        save(output_file_names(i,:),'x','y','descriptor','ground_truth');   
+  end
+  
+   %%% print out progress every 500 images    
+   if (mod(i,500)==0)
       fprintf('%d.',i);
    end
 end

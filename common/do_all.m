@@ -67,7 +67,7 @@ tp_avg = sum(tp_list) / num_p;
 fp_avg = sum(fp_list) / num_p;
 fscore_avg = sum(fscore_list) / num_p;
 roc_avg = sum(roc_area_list) / num_p;
-fprintf('Tested on: %d patients', num_p);
+fprintf('Tested on: %d patient(s)\n', num_p);
 fprintf('Averages:\nTruePos: %f \tFalsePos: %f \tFscore: %f \tROC Test Area: %f\n', ...
     tp_avg, fp_avg, fscore_avg, roc_avg);
 output_name = char(string(IMAGE_DIR) + "/output.mat");
