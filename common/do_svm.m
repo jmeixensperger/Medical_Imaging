@@ -120,11 +120,11 @@ fprintf('Training: Area under ROC curve = %f; Optimal threshold = %f\n', roc_are
 %%
 
 %%% Now save model out to file
-[fname,model_ind] = get_new_model_name([RUN_DIR,'\',Global.Model_Dir_Name],Global.Num_Zeros);
+[fname,model_ind] = get_new_model_name([RUN_DIR,'/',Global.Model_Dir_Name],Global.Num_Zeros);
 
 %%% save variables to file
 save(fname,'SVMModel','roc_curve_train','roc_op_train','roc_area_train','roc_threshold_train');
 
 %%% copy conf_file into models directory too..
 config_fname = which(config_file);
-copyfile(config_fname,[RUN_DIR,'\',Global.Model_Dir_Name,'\',Global.Config_File_Name,prefZeros(model_ind,Global.Num_Zeros),'.m']);
+copyfile(config_fname,[RUN_DIR,'/',Global.Model_Dir_Name,'/',Global.Config_File_Name,prefZeros(model_ind,Global.Num_Zeros),'.m']);

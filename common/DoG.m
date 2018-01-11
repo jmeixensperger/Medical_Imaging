@@ -47,9 +47,41 @@ for i = 1:nImages
        angle = f(4,:);
        descriptor = d;
        score = ones(1, nFeats);
-  else
-      % test hog, freak, surf, and other existing feature extractors
-      pass
+  % test hog, freak, surf, and other existing feature extractors
+  elseif extractor_type == "LBP"
+       [f,d] = vl_sift(imGray);
+       nFeats = size(f,2);
+       x = f(1,:);
+       y = f(2,:);
+       scale = f(3,:);
+       angle = f(4,:);
+       score = ones(1, nFeats);
+       descriptor = [];
+       for j = 1:nFeats
+           Top = round(x(j)-3*scale(j));
+           Bot = round(x(j)+3*scale(j));
+           Left = round(y(j)-3*scale(j));
+           Right = round(y(j)+3*scale(j));
+           [height, width, dim] = size(imGray);
+           
+           if(Left < 1)
+               Left = 1;
+           end
+           if(Top < 1)
+               Top = 1;
+           end
+           if(Bot > height)
+               Bot = height;
+           end
+           if(Right > width)
+               Right = width;
+           end
+           
+           patch = imcrop(imGray,[Left Top (Right-Left) (Bot-Top)]);
+           [H,W] = size(patch); 
+           descriptor = [descriptor; extractLBPFeatures(patch, 'CellSize',[H W])];
+       end
+       descriptor = transpose(descriptor);
   end
 
    % save ground truth information
