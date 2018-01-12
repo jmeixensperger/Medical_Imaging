@@ -103,6 +103,7 @@ for i = 1:nImages
            descriptor = [descriptor; extractLBPFeatures(patch, 'CellSize',[H W])];
        end
        descriptor = transpose(descriptor);
+       save(output_file_names(i,:),'x','y','scale','descriptor','ground_truth');
   end
   
    %%% print out progress every 500 images    
