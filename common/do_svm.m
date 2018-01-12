@@ -59,30 +59,33 @@ for a=1:length(ip_file_names)
 end 
 
 X = X';
-SVMModels = cell(5,1);
+SVMModel = cell(5,1);
 classes = unique(Categories.Name);
-% for i =1:numel(classes)
-%     indx = strcmp(Y,classes(i));
-%     SVMModels{i} = fitcsvm(X, indx, 'ClassNames', [false, true], 'Standardize', true, 'KernelFunction', 'rbf', 'OptimizeHyperparameters', 'auto');
-% end
+
+%Binary SVM classification (single model)
 indx = strcmp(Y,'healthy');
 SVMModel = fitcsvm(X, indx, 'ClassNames', [false, true], 'Standardize', true, ...
     'KernelFunction', 'rbf', 'BoxConstraint', 900, 'KernelScale', 400);
-    %'BoxConstraint', 1000, 'KernelScale', 500
+[predictY, values] = predict(SVMModel,X);
+%% Compute ROC and RPC on training data
+labels = indx;
+values = values(:,2)';
 
+% % Multi-class SVM classification (multiple models)
+% for i =1:numel(classes)
+%     indx = strcmp(Y,classes(i));
+%     SVMModels{i} = fitcsvm(X, indx, 'ClassNames', [false, true], 'Standardize', true, ...
+%     'KernelFunction', 'rbf', 'BoxConstraint', 900, 'KernelScale', 400);
+% end
 % Scores = zeros(size(X,1),numel(classes));
 % for i=1:numel(classes)
 %     [~,score] = predict(SVMModels{i},X);
 %     Scores(:,i) = score(:,2);
 % end
 % % Find max score (prediction for which class the ith image contains)
-% [~,maxScore] = max(Scores,[],2);
-
-[predictY, values] = predict(SVMModel,X);
-
-%%% Compute ROC and RPC on training data
-labels = indx;
-values = values(:,2)';
+% [maxScores, maxClass] = max(Scores,[],2);
+% labels = indx;
+% values = maxScores';
 
 %%
 

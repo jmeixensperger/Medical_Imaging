@@ -13,6 +13,8 @@ EXPERIMENT_TYPE = 'svm';
 % Patients to test on
 HEALTHY_PATIENTS = ["-1_3", "-1_5", "-1_11", "26", "30", "64"];
 
+HEALTHY_PATIENTS = ["30"];
+
 EXTRACTOR_TYPE = "filter_banks";
 
 OS = "windows";
@@ -25,7 +27,7 @@ OS = "windows";
 RUN_DIR = [ 'C:/Users/wisbo/Desktop/Medical_Imaging/experiments/bag_of_words' ];
 
 %%% Directory holding all the source images
-IMAGE_DIR = [ 'C:/Users/wisbo/Documents/converted' ];
+IMAGE_DIR = [ 'C:/Users/wisbo/Documents/converted3' ];
 
 %% Codebook directory - holds all VQ codebooks
 CODEBOOK_DIR = [ RUN_DIR, '/codebooks' ];
