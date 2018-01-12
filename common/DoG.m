@@ -36,29 +36,31 @@ for i = 1:nImages
   imGray = rgb2gray(im);
   
   % save ground truth information
-   ground_truth = "";
-   if contains(filestr,"healthy")
+  ground_truth = "";
+  if contains(filestr,"healthy")
        ground_truth = "healthy";
-   elseif contains(filestr,"emphysema")
+  elseif contains(filestr,"emphysema")
        ground_truth = "emphysema";
-   elseif contains(filestr,"fibrosis")
+  elseif contains(filestr,"fibrosis")
        ground_truth = "fibrosis";
-   elseif contains(filestr,"micronodules")
+  elseif contains(filestr,"micronodules")
        ground_truth = "micronodules";
-   elseif contains(filestr,"ground_glass")
+  elseif contains(filestr,"ground_glass")
        ground_truth = "ground_glass";
-   end
+  end
   
   % From f and d extract x, y, scale, angle and descriptor.
   % The following code was used to extract SIFT features (no longer used):
   % Total number of features from image
-  if extractor_type == "sift"
+  if extractor_type == "sift" || extractor_type == "lbp"
         imGray = single(imGray);
         [f,d] = vl_sift(imGray);
         nFeats = size(f,2);
         x = f(1,:);
         y = f(2,:);
         scale = f(3,:);
+  end
+  if extractor_type == "sift"
         angle = f(4,:);
         descriptor = d;
         score = ones(1, nFeats);
@@ -69,7 +71,38 @@ for i = 1:nImages
         descriptor = MRS4fast(imGray)';
         x = floor(i / cols) + 1;
         y = mod(i,rows) + 1;
-        save(output_file_names(i,:),'x','y','descriptor','ground_truth');   
+        save(output_file_names(i,:),'x','y','descriptor','ground_truth');
+  elseif extractor_type == "lbp"
+       [f,d] = vl_sift(imGray);
+       angle = f(4,:);
+       score = ones(1, nFeats);
+       descriptor = [];
+       for j = 1:nFeats
+           % Calculate bounds of feature
+           Top = round(x(j)-3*scale(j));
+           Bot = round(x(j)+3*scale(j));
+           Left = round(y(j)-3*scale(j));
+           Right = round(y(j)+3*scale(j));
+           [height, width, dim] = size(imGray);
+           % Clip out of bounds values
+           if(Left < 1)
+               Left = 1;
+           end
+           if(Top < 1)
+               Top = 1;
+           end
+           if(Bot > height)
+               Bot = height;
+           end
+           if(Right > width)
+               Right = width;
+           end
+           % Crop feature from image and find descriptor with LBP
+           patch = imcrop(imGray,[Left Top (Right-Left) (Bot-Top)]);
+           [H,W] = size(patch); 
+           descriptor = [descriptor; extractLBPFeatures(patch, 'CellSize',[H W])];
+       end
+       descriptor = transpose(descriptor);
   end
   
    %%% print out progress every 500 images    
